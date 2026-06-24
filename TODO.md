@@ -8,8 +8,7 @@
 |---|------|------|------|
 | 1 | 还书→预约联动 (returnBook hook + Hold 表) | G/远期 | ⏳ |
 | 2 | BarcodeLabel.vue (JsBarcode) | D/远期 | ⏳ |
-| 3 | API 集成测试 (8 route files, ~24 cases) | 远期 | ⏳ |
-| 4 | 前端组件测试 | 远期 | ⏳ |
+| 3 | 前端组件测试 | 远期 | ⏳ |
 
 ## Phase 2 待做 (engineering 工程)
 

@@ -64,7 +64,7 @@
 | 2026-06-24 | ASSESSMENT.md — 代码质量量化评估 | 加权总分 6.0/10, 骨架完整血肉待补 |
 | 2026-06-24 | ESLint v10 flat config + Prettier + Husky | Module H 完成, 0 errors 95 warnings, pre-commit 拦截 |
 | 2026-06-24 | Helmet + Rate Limit + CORS 白名单 | Module I 完成, 8 security headers, 100/min, localhost-only |
-| 2026-06-24 | CI + 集成测试 (34 route tests) | Module J 完成, GitHub Actions, 8 route files, 77 total tests |
+| 2026-06-24 | CI + 集成测试 (49 route tests) | Module J 完成, GitHub Actions, 92 total tests |
 | 2026-06-24 | requireAdmin 中间件替代内联 role 检查 | 减少代码重复，统一权限拦截。middleware/requireAdmin.ts 已创建。已完成 books/auth/borrows/categories(post)。待完成: categories(put/delete)/readers/stats/fines/rules (11处内联检查) |
 | 2026-06-24 | Module J 集成测试补全 (49 route tests) | 15 缺口补齐：auth.admin/create, books.items/update/barcode, categories.put/delete, borrows.admin/history/renew, readers.detail/update, stats.popular/monthly, fines.pay, rules.upsert。全 92 tests pass |
 
