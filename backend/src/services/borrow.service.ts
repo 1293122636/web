@@ -5,6 +5,18 @@ import type {
   ReturnResult,
   RenewResult,
 } from '../types/api.types.js'
+
+/**
+ * Borrow Orchestrator — coordinates across rules, fines, and holds domains.
+ *
+ * Domain dependencies:
+ *   rules.js    → getRule() for loanDays / borrow limit
+ *   fine.service.ts → createFine() / calcOverdueFine() for overdue charges
+ *   hold.service.ts → getNextPendingHold() for reservation promotion
+ *
+ * All three domains are consumed via pure function calls with PrismaClient
+ * passed as first argument, keeping this module testable via mock injection.
+ */
 import { getRule } from './rules.js'
 import { createFine, calcOverdueFine } from './fine.service.js'
 import { getNextPendingHold } from './hold.service.js'
