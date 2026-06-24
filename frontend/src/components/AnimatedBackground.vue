@@ -1,34 +1,29 @@
 <template>
   <div class="animated-bg">
     <div class="gradient-layer" />
-    <div class="particles">
-      <span v-for="i in 20" :key="i" class="particle" :style="particleStyle(i)" />
-    </div>
+    <span v-for="i in 20" :key="i" class="particle" :style="particles[i-1]" />
   </div>
 </template>
 
 <script setup lang="ts">
-function particleStyle(i: number) {
-  const size = 2 + Math.random() * 4
-  const left = Math.random() * 100
-  const delay = Math.random() * 12
-  const duration = 8 + Math.random() * 16
-  const opacity = 0.08 + Math.random() * 0.12
-  return {
-    width: `${size}px`,
-    height: `${size}px`,
-    left: `${left}%`,
-    animationDelay: `${delay}s`,
-    animationDuration: `${duration}s`,
-    opacity,
-  }
-}
+import { computed } from 'vue'
+
+const particles = computed(() =>
+  Array.from({ length: 20 }, () => ({
+    width: `${2 + Math.random() * 4}px`,
+    height: `${2 + Math.random() * 4}px`,
+    left: `${Math.random() * 100}%`,
+    animationDelay: `${Math.random() * 15}s`,
+    animationDuration: `${10 + Math.random() * 20}s`,
+    '--opacity': `${0.15 + Math.random() * 0.2}`,
+  }))
+)
 </script>
 
 <style scoped>
 .animated-bg {
   position: fixed; inset: 0; z-index: 0;
-  background: #08090b;
+  background: #08090b; overflow: hidden;
 }
 .gradient-layer {
   position: absolute; inset: 0;
@@ -48,17 +43,17 @@ function particleStyle(i: number) {
 
 .particle {
   position: absolute; bottom: -10px;
-  background: var(--accent, #5e6ad2);
+  background: rgba(113,112,255,0.5);
   border-radius: 50%;
   animation: floatUp linear infinite;
   pointer-events: none;
 }
-.particle:nth-child(odd) { background: rgba(113,112,255,0.4); }
-.particle:nth-child(3n) { background: rgba(200,160,80,0.3); }
+.particle:nth-child(even) { background: rgba(200,160,80,0.35); }
+.particle:nth-child(4n) { background: rgba(255,255,255,0.25); }
 
 @keyframes floatUp {
-  0% { transform: translateY(0) translateX(0) scale(1); opacity: var(--opacity, 0.1); }
-  50% { transform: translateY(-60vh) translateX(20px) scale(1.5); opacity: 0; }
-  100% { transform: translateY(-100vh) translateX(-10px) scale(0.5); opacity: 0; }
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: var(--opacity, 0.2); }
+  60%  { opacity: calc(var(--opacity, 0.2) * 0.5); }
+  100% { transform: translateY(-100vh) translateX(30px) scale(0.3); opacity: 0; }
 }
 </style>
