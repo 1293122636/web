@@ -109,6 +109,8 @@ export async function borrow(
     if (firstItem) targetItemId = firstItem.id;
   }
 
+  if (!targetBookId) throw Object.assign(new Error('Book not found'), { statusCode: 404 });
+
   const existing = await prisma.borrowRecord.findFirst({
     where: { userId, bookId: targetBookId!, status: 'active' },
   });

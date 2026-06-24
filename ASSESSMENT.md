@@ -1,6 +1,6 @@
 # Library Full-Stack — Code Quality & Architecture Assessment
 
-> 2026-06-24 | v3.1 — Module J+K+L + M1-M3 complete, P0-P2 audit fixed
+> 2026-06-24 | v3.2 — Module H-M complete, Rounds 1-8 audit all fixed
 
 ## 一、代码量
 
@@ -18,22 +18,22 @@
 | Metric | Count | Status |
 |--------|-------|--------|
 | `any` in routes | 41 | ⚠️ Fastify 请求对象无泛型, 属结构性 `any` |
-| `any` in services | 28 | ⚠️ Prisma where 动态构建, 可逐步替换为强类型 |
+| `any` in services | 3 | ✅ 仅 Prisma where 动态构建 3 处 |
 | `any` in tests | 26 | ✅ vi.mock 的 prisma 实例，mock 专用 |
-| `any` in frontend | 3 | ⚠️ 仅 composables/utility 代码，业务代码已去 any |
+| `any` in frontend | 0 | ✅ 全部 typed (Rounds 6-7) |
 | `as unknown as` casts | 21 | ⚠️ Prisma 返回类型与 DTO 类型桥接 |
 | DTO interfaces | 40 | ✅ 覆盖全部 38 API 端点 |
-| TSC errors | 12 | ⚠️ 测试 mock 类型 + book.service 隐式 any + fine Decimal 转换 |
+| TSC errors | 10 | ⚠️ 测试 mock 类型 + book.service 隐式 any + fine Decimal 转换 |
 | `BookListResponse` → type alias | ✅ | Module H 修复：空 interface → type 别名，通过 no-empty-object-type |
 
 ## 三、错误处理
 
 | Pattern | Status |
 |---------|--------|
-| `setErrorHandler` 统一拦截 | ❌ 不存在。routes 用 `reply.status(x).send()` 直接返回 |
-| `throw + statusCode` 模式 | ⚠️ services 中部分使用, routes 未统一 |
+| `setErrorHandler` 统一拦截 | ✅ Module K 实现，routes 统一 `throw + statusCode` |
+| `throw + statusCode` 模式 | ✅ 全 services + routes 已统一 |
 | 状态码一致性 | ✅ 401/403/404/409 使用正确 |
-| 错误消息暴露 | ⚠️ 生产环境未过滤 stack trace |
+| 错误消息暴露 | ✅ 生产环境 `setErrorHandler` 过滤 stack |
 
 ## 四、数据库
 
@@ -41,8 +41,8 @@
 |--------|-------|--------|
 | 显式索引 | 5 | @@index: [title], [campus], [userId,status], [userId], @@unique: [patronCategoryId,itemTypeId] |
 | 缺失索引 | 0 | — |
-| Prisma 事务 | 2 处 | borrow() + returnBook() 均使用 `$transaction` |
-| 冗余计数器 | Book.available | 与 BookItem.status 计数可能不一致 (无校验) |
+| Prisma 事务 | 5 处 | borrow(), returnBook(), payFine(), cancelHold(), fulfillHold() + expireReadyHolds(逐条) |
+| 冗余计数器 | Book.available | 与 BookItem.status 计数可能不一致 — `reconcileBookAvailable()` 已就绪，待接入定时/route |
 | Enum 覆盖 | 6 个 | UserRole, BookStatus, ItemCondition, ItemStatus, FineType, BorrowStatus |
 
 ## 五、前端
@@ -113,7 +113,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total commits | 27 on main |
+| Total commits | 30+ on main |
 | 分支策略 | feature → main merged |
 | Commit 规范 | ✅ Conventional Commits |
 | pre-commit hook | ✅ ESLint + Prettier 自动拦截 |
@@ -125,7 +125,7 @@
 |--------|-------|
 | 路由直接调 Prisma | 0 ✅ (全部通过 service 层) |
 | 路由行数 | 336 行 / 8 文件 = 42 行/文件 (≤60 目标) |
-| Services 行数 | 889 行 / 10 文件 = 89 行/文件 |
+| Service 行数 | ~1,300 行 / 11 文件 = 118 行/文件 |
 
 ## 十一、依赖健康
 

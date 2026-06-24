@@ -83,23 +83,25 @@ export async function cancelHold(
     throw Object.assign(new Error('Hold already resolved'), { statusCode: 400 })
   }
 
-  await prisma.hold.update({
-    where: { id: holdId },
-    data: { status: 'cancelled' },
-  })
+  await prisma.$transaction(async (tx) => {
+    await tx.hold.update({
+      where: { id: holdId },
+      data: { status: 'cancelled' },
+    })
 
-  // Release the reserved bookItem if hold was in ready state
-  if (hold.status === 'ready' && hold.bookItemId) {
-    validateItemStatus('on_hold', 'available');
-    await prisma.bookItem.update({
-      where: { id: hold.bookItemId },
-      data: { status: 'available' },
-    })
-    await prisma.book.update({
-      where: { id: hold.bookId },
-      data: { available: { increment: 1 } },
-    })
-  }
+    // Release the reserved bookItem if hold was in ready state
+    if (hold.status === 'ready' && hold.bookItemId) {
+      validateItemStatus('on_hold', 'available');
+      await tx.bookItem.update({
+        where: { id: hold.bookItemId },
+        data: { status: 'available' },
+      })
+      await tx.book.update({
+        where: { id: hold.bookId },
+        data: { available: { increment: 1 } },
+      })
+    }
+  })
 }
 
 /**
@@ -111,11 +113,17 @@ async function expireReadyHolds(prisma: PrismaClient): Promise<void> {
     where: { status: 'ready', expiryDate: { lt: now } },
   })
   for (const h of expired) {
-    await prisma.hold.update({ where: { id: h.id }, data: { status: 'expired' } })
-    if (h.bookItemId) {
-      validateItemStatus('on_hold', 'available');
-      await prisma.bookItem.update({ where: { id: h.bookItemId }, data: { status: 'available' } })
-      await prisma.book.update({ where: { id: h.bookId }, data: { available: { increment: 1 } } })
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.hold.update({ where: { id: h.id }, data: { status: 'expired' } })
+        if (h.bookItemId) {
+          validateItemStatus('on_hold', 'available');
+          await tx.bookItem.update({ where: { id: h.bookItemId }, data: { status: 'available' } })
+          await tx.book.update({ where: { id: h.bookId }, data: { available: { increment: 1 } } })
+        }
+      })
+    } catch {
+      // Skip individual failures — one expired hold shouldn't block others
     }
   }
 }
@@ -204,25 +212,27 @@ export async function fulfillHold(
       { statusCode: 400 })
   }
 
-  const updated = await prisma.hold.update({
-    where: { id: holdId },
-    data: {
-      status: 'fulfilled',
-      fulfilledAt: new Date(),
-    },
-    include: {
-      book: { select: { id: true, title: true, author: true, isbn: true } },
-    },
-  })
-
-  // Mark the reserved item as borrowed
-  if (hold.bookItemId) {
-    validateItemStatus('on_hold', 'borrowed');
-    await prisma.bookItem.update({
-      where: { id: hold.bookItemId },
-      data: { status: 'borrowed' },
+  const [updated] = await prisma.$transaction(async (tx) => {
+    const u = await tx.hold.update({
+      where: { id: holdId },
+      data: {
+        status: 'fulfilled',
+        fulfilledAt: new Date(),
+      },
+      include: {
+        book: { select: { id: true, title: true, author: true, isbn: true } },
+      },
     })
-  }
+
+    if (hold.bookItemId) {
+      validateItemStatus('on_hold', 'borrowed');
+      await tx.bookItem.update({
+        where: { id: hold.bookItemId },
+        data: { status: 'borrowed' },
+      })
+    }
+    return [u]
+  })
 
   return {
     id: updated.id,

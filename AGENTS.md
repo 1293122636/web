@@ -76,6 +76,7 @@
 | 2026-06-24 | P0-P2 审计修复 (M1-M3) | notifyNextHold available 递减、cancelHold 复本释放、fulfillHold item 更新、过期自废、公开 count 端点、测试强化 |
 | 2026-06-24 | 第六轮全代码审计 (12 fixes) | Search bare fetch→store, BookDetail request→bookApi, token→hasToken(), rules dead code, admin any[]→typed, alert→useMessage, requireAdmin as any→typed, api barrel re-export |
 | 2026-06-24 | 第七轮全代码审计 (17 fixes) | P0 Circulation 还书 bug, BookListResponse data→books, HoldResponse 重写, listFines 分页, 11 处 any→typed, menu补circulation, reader/Books→bookApi, facets as any→typed |
+| 2026-06-24 | 第八轮专项审计 (12 fixes) | hold cancel/fulfill/expire 三处加 $transaction, ASSESSMENT.md 全量更新(any/error/counts), borrow targetBookId guard, PLAN fines.ts→fine.service.ts |
 
 ## 环境变量
 ### 必需变量（backend/.env）

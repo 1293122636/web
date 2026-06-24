@@ -265,8 +265,8 @@ Module A ──┬──→ B ──→ C ──┬──→ E ──→ G
 | 新建 | `backend/src/services/stats.service.ts` | overview, popular, monthly |
 | 新建 | `backend/src/services/fine.service.ts` | listFines, myFines, payFine |
 | 新建 | `backend/src/services/rule.service.ts` | listRules, patronCategories, itemTypes, upsert |
-| 保留 | `backend/src/services/rules.ts` | getRule, checkBorrowLimit (已有，不动) |
-| 保留 | `backend/src/services/fines.ts` | createFine, calcOverdueFine (已有，不动) |
+| 保留 | `backend/src/services/rules.ts` | getRule (已有，不动) |
+| 保留 | `backend/src/services/fine.service.ts` | createFine, calcOverdueFine (已合并) |
 | 重写 | `backend/src/routes/*.ts` (8个) | 每个 handler ≤30行，只调 service |
 
 ### 服务函数签名
