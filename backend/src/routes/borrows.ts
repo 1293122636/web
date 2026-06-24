@@ -1,13 +1,13 @@
 import { FastifyInstance } from 'fastify';
 import * as borrowService from '../services/borrow.service.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 export async function borrowRoutes(app: FastifyInstance) {
   app.get('/my', { onRequest: [app.authenticate] }, async (request: any) =>
     borrowService.getMyBorrows(app.prisma, request.user.id),
   );
 
-  app.get('/', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.get('/', { onRequest: [app.authenticate, requireAdmin] }, async (request: any) => {
     return borrowService.getAllBorrows(app.prisma);
   });
 

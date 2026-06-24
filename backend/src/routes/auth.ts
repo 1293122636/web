@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import * as authService from '../services/auth.service.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const registerSchema = z.object({
   username: z.string().min(3).max(50),
@@ -8,6 +9,11 @@ const registerSchema = z.object({
   name: z.string().min(1).max(100),
   phone: z.string().optional(),
   email: z.string().email().optional(),
+});
+
+const loginSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1),
 });
 
 export async function authRoutes(app: FastifyInstance) {
@@ -25,7 +31,9 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   app.post('/login', async (request, reply) => {
-    const { username, password } = request.body as any;
+    const parsed = loginSchema.safeParse(request.body);
+    if (!parsed.success) return reply.status(400).send({ error: 'Validation failed' });
+    const { username, password } = parsed.data;
     try {
       return await authService.login(app.prisma, app.jwt, username, password);
     } catch (e: any) {
@@ -41,13 +49,11 @@ export async function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get('/users', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.get('/users', { onRequest: [app.authenticate, requireAdmin] }, async (request: any) => {
     return authService.listUsers(app.prisma);
   });
 
-  app.post('/admin/create', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.post('/admin/create', { onRequest: [app.authenticate, requireAdmin] }, async (request: any, reply: any) => {
     const parsed = registerSchema.safeParse(request.body);
     if (!parsed.success) return reply.status(400).send({ error: 'Validation failed' });
     try {

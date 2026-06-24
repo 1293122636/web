@@ -19,8 +19,8 @@ export async function readerRoutes(app: FastifyInstance) {
     if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
     try {
       return await userService.updateReader(app.prisma, parseInt(request.params.id), request.body);
-    } catch {
-      return reply.status(404).send({ error: 'Reader not found' });
+    } catch (e: any) {
+      return reply.status(e.statusCode || 500).send({ error: e.message });
     }
   });
 

@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import * as bookService from '../services/book.service.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 
 const createSchema = z.object({
   isbn: z.string().min(1).max(20),
@@ -46,8 +47,7 @@ export async function bookRoutes(app: FastifyInstance) {
     return book;
   });
 
-  app.post('/', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.post('/', { onRequest: [app.authenticate, requireAdmin] }, async (request: any, reply: any) => {
     const parsed = createSchema.safeParse(request.body);
     if (!parsed.success)
       return reply
@@ -56,8 +56,7 @@ export async function bookRoutes(app: FastifyInstance) {
     return bookService.create(app.prisma, parsed.data);
   });
 
-  app.put('/:id', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.put('/:id', { onRequest: [app.authenticate, requireAdmin] }, async (request: any, reply: any) => {
     const parsed = createSchema.partial().safeParse(request.body);
     if (!parsed.success) return reply.status(400).send({ error: 'Validation failed' });
     try {
@@ -67,8 +66,7 @@ export async function bookRoutes(app: FastifyInstance) {
     }
   });
 
-  app.delete('/:id', { onRequest: [app.authenticate] }, async (request: any, reply: any) => {
-    if (request.user.role !== 'admin') return reply.status(403).send({ error: 'Admin only' });
+  app.delete('/:id', { onRequest: [app.authenticate, requireAdmin] }, async (request: any, reply: any) => {
     try {
       await bookService.remove(app.prisma, parseInt(request.params.id));
       return { success: true };
