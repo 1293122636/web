@@ -31,14 +31,15 @@
 | # | 任务 | 归属 |
 |---|------|------|
 | 1 | GitHub Actions workflow (lint→test→build) | J | ✅ |
-| 2 | Fastify inject 集成测试 (8 route files) | J | ✅ |
+| 2 | Fastify inject 集成测试 (49 route tests, 全 8 路由覆盖) | J | ✅ |
 
 ### Module K: 性能优化
 | # | 任务 | 归属 |
 |---|------|------|
-| 1 | MySQL 索引: Book.title, BookItem.campus | K |
-| 2 | MySQL 索引: BorrowRecord(userId,status), Fine.userId | K |
-| 3 | setErrorHandler 统一错误拦截 | K |
+| 1 | requireAdmin 中间件迁移 (4/8 routes done, 11 inline checks remain) | K |
+| 2 | MySQL 索引: Book.title, BookItem.campus | K |
+| 3 | MySQL 索引: BorrowRecord(userId,status), Fine.userId | K |
+| 4 | setErrorHandler 统一错误拦截 | K |
 
 ### Module L: 收尾
 | # | 任务 | 归属 |

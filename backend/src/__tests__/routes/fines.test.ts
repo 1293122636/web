@@ -40,4 +40,33 @@ describe('Fines Integration', () => {
     const res = await app.inject({ method: 'GET', url: '/api/fines' });
     expect(res.statusCode).toBe(401);
   });
+
+  it('POST /api/fines/:id/pay — admin can pay fine', async () => {
+    // Create a borrower + book + borrow record first
+    const reader = await app.inject({ method: 'POST', url: '/api/auth/register', payload: { username: 'it_finepay', password: 'reader123', name: 'Fine Pay' } });
+    const userId = reader.json().user.id;
+    // Need a real borrow record — create via borrow endpoint
+    const cat = await prisma.category.create({ data: { name: 'Fine Test Cat' } });
+    const book = await prisma.book.create({ data: { isbn: '978-FN-000001', title: 'Fine Test Book', author: 'X', total: 1, available: 1, categoryId: cat.id } });
+    await prisma.bookItem.create({ data: { barcode: 'LIB-FINE-001', callNumber: 'F001', location: 'Shelf', bookId: book.id, itemTypeId: 1 } });
+    const borrow = await app.inject({ method: 'POST', url: '/api/borrows/borrow', headers: authHeaders(readerToken), payload: { bookId: book.id } });
+    const borrowId = borrow.json().id;
+
+    const fine = await prisma.fine.create({
+      data: { userId, amount: 5.0, type: 'overdue', borrowRecordId: borrowId },
+    });
+    const res = await app.inject({
+      method: 'POST', url: `/api/fines/${fine.id}/pay`,
+      headers: authHeaders(adminToken),
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().paid).toBe(true);
+
+    // Cleanup test data
+    await prisma.fine.deleteMany({ where: { userId } });
+    await prisma.borrowRecord.deleteMany({ where: { id: borrowId } });
+    await prisma.bookItem.deleteMany({ where: { barcode: 'LIB-FINE-001' } });
+    await prisma.book.deleteMany({ where: { isbn: '978-FN-000001' } });
+    await prisma.category.deleteMany({ where: { name: 'Fine Test Cat' } });
+  });
 });

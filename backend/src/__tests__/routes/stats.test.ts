@@ -32,4 +32,16 @@ describe('Stats Integration', () => {
     const res = await app.inject({ method: 'GET', url: '/api/stats' });
     expect(res.statusCode).toBe(401);
   });
+
+  it('GET /api/stats/popular — returns popular books', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/stats/popular', headers: authHeaders(adminToken) });
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.json())).toBe(true);
+  });
+
+  it('GET /api/stats/monthly — returns monthly stats', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/stats/monthly', headers: authHeaders(adminToken) });
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.json())).toBe(true);
+  });
 });

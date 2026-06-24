@@ -84,6 +84,41 @@ describe('Books Integration', () => {
     expect(Object.keys(body.facets).length).toBeGreaterThanOrEqual(1);
   });
 
+  it('GET /api/books/:id/items — returns items with barcodes', async () => {
+    const book = await prisma.book.findFirst({ where: { isbn: '978-0-00-000000-1' } });
+    const res = await app.inject({ method: 'GET', url: `/api/books/${book!.id}/items` });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.book).toBeDefined();
+    expect(body.book.title).toBe('IT Test Book');
+    expect(Array.isArray(body.items)).toBe(true);
+  });
+
+  it('PUT /api/books/:id — admin can update book', async () => {
+    const book = await prisma.book.findFirst({ where: { isbn: '978-0-00-000000-1' } });
+    const res = await app.inject({
+      method: 'PUT', url: `/api/books/${book!.id}`,
+      headers: authHeaders(adminToken),
+      payload: { title: 'Updated Test Book', year: 2025 },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().title).toBe('Updated Test Book');
+    expect(res.json().year).toBe(2025);
+  });
+
+  it('GET /api/book-items/:barcode — returns item by barcode', async () => {
+    // Seed a book item
+    const book = await prisma.book.findFirst({ where: { isbn: '978-0-00-000000-1' } });
+    await prisma.bookItem.create({
+      data: { barcode: 'LIB-TEST-001', callNumber: 'T001', location: 'Shelf A', bookId: book!.id, itemTypeId: 1 },
+    });
+    const res = await app.inject({ method: 'GET', url: '/api/book-items/LIB-TEST-001' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().item.barcode).toBe('LIB-TEST-001');
+    // clean up
+    await prisma.bookItem.delete({ where: { barcode: 'LIB-TEST-001' } });
+  });
+
   it('POST /api/books — admin can create book', async () => {
     const res = await app.inject({
       method: 'POST',

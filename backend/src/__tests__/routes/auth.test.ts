@@ -139,4 +139,30 @@ describe('Auth Integration', () => {
     });
     expect(res.statusCode).toBe(403);
   });
+
+  it('POST /api/auth/admin/create — admin can create another admin', async () => {
+    const r = await app.inject({
+      method: 'POST',
+      url: '/api/auth/register',
+      payload: { username: 'it_master', password: 'pass123', name: 'Master' },
+    });
+    const userId = r.json().user.id;
+    await prisma.user.update({ where: { id: userId }, data: { role: 'admin' } });
+    const login = await app.inject({
+      method: 'POST',
+      url: '/api/auth/login',
+      payload: { username: 'it_master', password: 'pass123' },
+    });
+    const adminToken2 = login.json().token;
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/auth/admin/create',
+      headers: authHeaders(adminToken2),
+      payload: { username: 'it_staff', password: 'staff123', name: 'Staff' },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.username || body.user?.username).toBe('it_staff');
+    expect(body.role || body.user?.role).toBe('admin');
+  });
 });

@@ -40,4 +40,24 @@ describe('Readers Integration', () => {
     expect(res.statusCode).toBe(200);
     expect(res.json().name).toBe('Updated Name');
   });
+
+  it('GET /api/readers/:id — admin can get reader detail', async () => {
+    const reader = await app.inject({ method: 'POST', url: '/api/auth/register', payload: { username: 'it_rddet', password: 'reader123', name: 'Detail Reader' } });
+    const readerId = reader.json().user.id;
+    const res = await app.inject({ method: 'GET', url: `/api/readers/${readerId}`, headers: authHeaders(adminToken) });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().username).toBe('it_rddet');
+  });
+
+  it('PUT /api/readers/:id — admin can update reader', async () => {
+    const reader = await app.inject({ method: 'POST', url: '/api/auth/register', payload: { username: 'it_rdup', password: 'reader123', name: 'Update Reader' } });
+    const readerId = reader.json().user.id;
+    const res = await app.inject({
+      method: 'PUT', url: `/api/readers/${readerId}`,
+      headers: authHeaders(adminToken),
+      payload: { name: 'Admin Updated', phone: '13800138000' },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().name).toBe('Admin Updated');
+  });
 });

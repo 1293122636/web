@@ -52,4 +52,24 @@ describe('Categories Integration', () => {
     });
     expect(res.statusCode).toBe(401);
   });
+
+  it('PUT /api/categories/:id — admin can update', async () => {
+    const cat = await prisma.category.create({ data: { name: 'IT Cat Beta' } });
+    const res = await app.inject({
+      method: 'PUT', url: `/api/categories/${cat.id}`,
+      headers: authHeaders(adminToken),
+      payload: { name: 'IT Cat Beta Updated' },
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().name).toBe('IT Cat Beta Updated');
+  });
+
+  it('DELETE /api/categories/:id — admin can delete empty category', async () => {
+    const cat = await prisma.category.create({ data: { name: 'IT Cat Gamma' } });
+    const res = await app.inject({
+      method: 'DELETE', url: `/api/categories/${cat.id}`,
+      headers: authHeaders(adminToken),
+    });
+    expect(res.statusCode).toBe(200);
+  });
 });

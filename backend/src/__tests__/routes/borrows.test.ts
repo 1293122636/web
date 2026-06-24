@@ -54,11 +54,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await prisma.borrowRecord.deleteMany({ where: { book: { isbn: { startsWith: '978-BB' } } } });
-  await prisma.bookItem.deleteMany({ where: { barcode: { startsWith: 'LIB-BRB' } } });
+  await prisma.bookItem.deleteMany({ where: { OR: [{ barcode: { startsWith: 'LIB-BRB' } }, { barcode: { startsWith: 'LIB-REN' } }] } });
   await prisma.book.deleteMany({ where: { isbn: { startsWith: '978-BB' } } });
-  await prisma.category.deleteMany({ where: { name: 'Borrow Test' } });
+  await prisma.category.deleteMany({ where: { name: { in: ['Borrow Test', 'Renew Test'] } } });
   await prisma.user.deleteMany({ where: { username: { startsWith: 'it_borrow' } } });
-  // Don't clean up ItemType/PatronCategory — they're shared
   await prisma.$disconnect();
 });
 
@@ -123,5 +122,36 @@ describe('Borrows Integration', () => {
     });
     expect(res.statusCode).toBe(200);
     expect(res.json().status).toBe('returned');
+  });
+
+  it('GET /api/borrows — admin can list all borrows', async () => {
+    const r = await app.inject({ method: 'POST', url: '/api/auth/register', payload: { username: 'it_bradm', password: 'admin123', name: 'Br Admin' } });
+    await prisma.user.update({ where: { id: r.json().user.id }, data: { role: 'admin' } });
+    const login = await app.inject({ method: 'POST', url: '/api/auth/login', payload: { username: 'it_bradm', password: 'admin123' } });
+    const token = login.json().token;
+    const res = await app.inject({ method: 'GET', url: '/api/borrows', headers: authHeaders(token) });
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.json())).toBe(true);
+  });
+
+  it('GET /api/borrows/history — reader can see borrow history', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/borrows/history', headers: authHeaders(readerToken) });
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.json())).toBe(true);
+  });
+
+  it('POST /api/borrows/renew/:id — reader can renew', async () => {
+    // Borrow a fresh book
+    const book = await prisma.book.create({
+      data: { isbn: '978-BB-RENEW-1', title: 'Renew Book', author: 'R', total: 1, available: 1, categoryId: (await prisma.category.create({ data: { name: 'Renew Test' } })).id },
+    });
+    await prisma.bookItem.create({ data: { barcode: 'LIB-REN-001', callNumber: 'R001', location: 'Shelf', bookId: book.id, itemTypeId: 1 } });
+    const br = await app.inject({ method: 'POST', url: '/api/borrows/borrow', headers: authHeaders(readerToken), payload: { bookId: book.id } });
+    expect(br.statusCode).toBe(200);
+    const borrowId = br.json().id;
+
+    const res = await app.inject({ method: 'POST', url: `/api/borrows/renew/${borrowId}`, headers: authHeaders(readerToken) });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().renewed).toBe(true);
   });
 });
