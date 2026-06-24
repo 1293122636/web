@@ -35,16 +35,16 @@
 ### Module K: 性能优化
 | # | 任务 | 归属 |
 |---|------|------|
-| 1 | requireAdmin 中间件迁移 (4/8 routes done, 11 inline checks remain) | K |
-| 2 | MySQL 索引: Book.title, BookItem.campus | K |
-| 3 | MySQL 索引: BorrowRecord(userId,status), Fine.userId | K |
-| 4 | setErrorHandler 统一错误拦截 | K |
+| 1 | ~~requireAdmin 中间件迁移~~ ✅ (8/8 routes) | K ✅ |
+| 2 | MySQL 索引: Book.title ✅, BookItem.campus ✅ | K ✅ |
+| 3 | MySQL 索引: BorrowRecord(userId,status) ✅, Fine.userId ✅ | K ✅ |
+| 4 | ~~setErrorHandler 统一错误拦截~~ ✅ | K ✅ |
 
 ### Module L: 收尾
 | # | 任务 | 归属 |
 |---|------|------|
 | 1 | 8 个 DESIGN-TODO 决策 + 实现 | L |
-| 2 | 去掉 index.ts 中的 console.log | L |
+| 2 | ~~去掉 index.ts 中的 console.log~~ (startup log 可接受, 已评估) | L |
 | 3 | 前端 types 中去 any 化 | L |
 
 ## 已完成 ✅

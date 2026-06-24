@@ -152,6 +152,7 @@ model Book {
   items         BookItem[]
   borrowRecords BorrowRecord[]
 
+  @@index([title])
   @@map("books")
 }
 
@@ -177,6 +178,7 @@ model BookItem {
 
   borrowRecords BorrowRecord[]
 
+  @@index([campus])
   @@map("book_items")
 }
 
@@ -203,6 +205,7 @@ model BorrowRecord {
 
   fines Fine[]
 
+  @@index([userId, status])
   @@map("borrow_records")
 }
 
@@ -223,5 +226,6 @@ model Fine {
 
   type FineType @default(overdue)
 
+  @@index([userId])
   @@map("fines")
 }
