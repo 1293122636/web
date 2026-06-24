@@ -50,38 +50,4 @@ export async function getRule(
   };
 }
 
-/**
- * 借书前置检查：读者是否超借阅上限
- */
-export async function checkBorrowLimit(
-  prisma: PrismaClient,
-  userId: number,
-  patronCategoryId: number | null,
-): Promise<{ allowed: boolean; currentCount: number; maxBorrows: number; message?: string }> {
-  const currentCount = await prisma.borrowRecord.count({
-    where: { userId, status: 'active' },
-  });
-
-  if (!patronCategoryId) {
-    if (currentCount >= DEFAULTS.maxBorrows) {
-      return {
-        allowed: false,
-        currentCount,
-        maxBorrows: DEFAULTS.maxBorrows,
-        message: `已达到借阅上限 ${DEFAULTS.maxBorrows} 册`,
-      };
-    }
-    return { allowed: true, currentCount, maxBorrows: DEFAULTS.maxBorrows };
-  }
-
-  const rule = await getRule(prisma, patronCategoryId, null);
-  if (currentCount >= rule.maxBorrows) {
-    return {
-      allowed: false,
-      currentCount,
-      maxBorrows: rule.maxBorrows,
-      message: `已达到借阅上限 ${rule.maxBorrows} 册`,
-    };
-  }
-  return { allowed: true, currentCount, maxBorrows: rule.maxBorrows };
-}
+// checkBorrowLimit retired — logic inlined into borrow.service.ts for single getRule() call

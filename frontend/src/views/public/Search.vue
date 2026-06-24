@@ -11,7 +11,7 @@
     <n-layout-content>
       <div class="content">
         <aside class="sidebar">
-          <FacetPanel :facets="facets" :active="activeFilters" @select="onFacetSelect" />
+          <FacetPanel :facets="store.facets" :active="activeFilters" @select="onFacetSelect" />
         </aside>
         <main class="main">
           <SearchBar @search="onSearch" />
@@ -39,25 +39,22 @@ import SearchBar from '../../components/SearchBar.vue'
 import FacetPanel from '../../components/FacetPanel.vue'
 import BookGrid from '../../components/BookGrid.vue'
 import { useBookStore } from '../../stores/books'
-import type { FacetValue } from '../../types/api'
+import type { BookListParams } from '../../types/api'
 
 const router = useRouter()
 const store = useBookStore()
-const facets = ref<Record<string, FacetValue[]>>({})
 const activeFilters = ref<Record<string, string>>({})
 
 const totalPages = computed(() => Math.max(1, Math.ceil(store.total / 20)))
 
 onMounted(async () => {
   await store.search({})
-  const res = await (await fetch('/api/books/facets')).json()
-  facets.value = res.facets || {}
+  await store.updateFacets()
 })
 
 async function onSearch(query: string) {
   await store.search({ search: query || undefined })
-  const res = await (await fetch('/api/books/facets' + (query ? `?search=${encodeURIComponent(query)}` : ''))).json()
-  facets.value = res.facets || {}
+  await store.updateFacets(query || undefined)
 }
 
 async function onFacetSelect(key: string, value: string) {

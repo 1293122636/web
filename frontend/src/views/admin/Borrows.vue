@@ -15,11 +15,11 @@
 import { ref, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton, NPopconfirm } from 'naive-ui'
 import { api } from '../../api'
-import type { BorrowRecordResponse, FineResponse } from '../../types/api'
+import type { BorrowRecordResponse, FineResponse, DataRow } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const records = ref<any[]>([])
+const records = ref<BorrowRecordResponse[]>([])
 const loading = ref(false)
 
 const statusMap: Record<string, { type: 'success' | 'warning' | 'error' | 'info' | 'default'; label: string }> = {
@@ -68,7 +68,7 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchRecords() {
   loading.value = true
-  try { records.value = (await api.get<{ borrows: any[]; total: number }>('/borrows')).borrows } catch {}
+  try { records.value = (await api.get<{ borrows: BorrowRecordResponse[]; total: number }>('/borrows')).borrows } catch {}
   loading.value = false
 }
 

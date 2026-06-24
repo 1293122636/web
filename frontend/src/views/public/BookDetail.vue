@@ -45,46 +45,46 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { NLayout, NLayoutHeader, NLayoutContent, NButton, NSpace, NSpin, NDivider, NDescriptions, NDescriptionsItem } from 'naive-ui'
+import { NLayout, NLayoutHeader, NLayoutContent, NButton, NSpace, NSpin, NDivider, NDescriptions, NDescriptionsItem, useMessage } from 'naive-ui'
 import HoldingsTable from '../../components/HoldingsTable.vue'
-import { api, request } from '../../api'
-import type { BookDetail, BookItemSummary } from '../../types/api'
+import { api, bookApi } from '../../api'
+import type { BookDetail } from '../../types/api'
 
 const route = useRoute()
+const message = useMessage()
 const book = ref<BookDetail | null>(null)
 const loading = ref(true)
 const holdCount = ref(0)
-const token = !!localStorage.getItem('token')
+function hasToken() { return !!localStorage.getItem('token') }
 
 onMounted(async () => {
   const id = Number(route.params.id)
   try {
-    book.value = await request<BookDetail>(`/books/${id}`)
+    book.value = await bookApi.getById(id)
     // Fetch hold count
     if (book.value && book.value.available === 0) {
       try {
-        const res = await fetch(`/api/holds/count?bookId=${id}`)
-        const data = await res.json()
-        holdCount.value = data.count ?? 0
+        const res = await api.get<{ count: number }>('/holds/count?bookId=' + id)
+        holdCount.value = res.count ?? 0
       } catch { holdCount.value = 0 }
     }
   } finally { loading.value = false }
 })
 
 function handleBorrow() {
-  if (!token) { window.location.href = '/login'; return }
+  if (!hasToken()) { window.location.href = '/login'; return }
   // Redirect to reader books page
   window.location.href = '/reader/books'
 }
 
 async function handleHold() {
-  if (!token) { window.location.href = '/login'; return }
+  if (!hasToken()) { window.location.href = '/login'; return }
   if (!book.value) return
   try {
     await api.post('/holds', { bookId: book.value.id })
     holdCount.value++
-    alert('预约成功！有书归还时将通知您。')
-  } catch (e: unknown) { alert((e as Error).message) }
+    message.success('预约成功！有书归还时将通知您。')
+  } catch (e: unknown) { message.error((e as Error).message) }
 }
 </script>
 

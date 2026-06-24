@@ -67,12 +67,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton, NPopconfirm, NPopover } from 'naive-ui'
-import { api } from '../../api'
-import type { BookItemsResponse, BookListResponse, BookItemSummary, CategoryResponse, DataRow } from '../../types/api'
+import { api, bookApi } from '../../api'
+import type { BookListResponse, BookItemSummary, BookSummary, CategoryResponse, DataRow } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const books = ref<any[]>([])
+const books = ref<BookSummary[]>([])
 const loading = ref(false)
 const search = ref('')
 const filterCategory = ref<number | null>(null)
@@ -162,10 +162,12 @@ const ExpandItems = {
 async function fetchBooks() {
   loading.value = true
   try {
-    const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.pageSize) })
-    if (search.value) params.set('search', search.value)
-    if (filterCategory.value) params.set('categoryId', String(filterCategory.value))
-    const res = await api.get<BookListResponse>(`/books?${params}`)
+    const res = await bookApi.list({
+      page: pagination.page,
+      limit: pagination.pageSize,
+      search: search.value || undefined,
+      categoryId: filterCategory.value ?? undefined,
+    })
     books.value = res.books
     pagination.itemCount = res.total
   } catch { message.error('加载失败') }
@@ -223,8 +225,8 @@ async function handleAddCopy() {
   if (!copyForm.barcode) { message.warning('条码号必填'); return }
   copySaving.value = true
   try {
-    // No dedicated API yet — use generic POST (or extend later)
-    message.success('复本功能待后端接口支持')
+    // [DESIGN-TODO: 复本添加后端接口] — 当前无 /api/books/:id/items POST 端点
+    message.info('复本功能暂未开放，请联系管理员手动添加')
     showCopyModal.value = false
   } catch (e: unknown) { message.error((e as Error).message) }
   copySaving.value = false

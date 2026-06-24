@@ -46,3 +46,4 @@ export function clearAuth() { localStorage.removeItem('user'); localStorage.remo
 export function getUser(): UserProfile | null {
   try { const u = localStorage.getItem('user'); return u ? JSON.parse(u) : null } catch { return null }
 }
+export { bookApi } from './books'

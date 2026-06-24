@@ -89,7 +89,7 @@ const fineColumns: DataTableColumns<Record<string, unknown>> = [
 
 const holdColumns: DataTableColumns<Record<string, unknown>> = [
   { title: '书名', key: 'book', width: 200, ellipsis: { tooltip: true },
-    render: (r) => (r as any).book?.title || '-' },
+    render: (r) => (r as unknown as HoldResponse).book?.title || '-' },
   { title: '预约日', key: 'requestDate', width: 110, render: (r) => new Date(r.requestDate).toLocaleDateString('zh-CN') },
   { title: '状态', key: 'status', width: 80, render: (r) => {
     const m: Record<string, { t: string; l: string }> = { pending: { t: 'warning', l: '排队中' }, ready: { t: 'success', l: '可取' }, fulfilled: { t: 'default', l: '已取' }, cancelled: { t: 'error', l: '已取消' }, expired: { t: 'default', l: '已过期' } }
