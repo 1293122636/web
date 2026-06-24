@@ -19,7 +19,7 @@ import { computed } from 'vue'
 import { NCollapse, NCollapseItem, NTag } from 'naive-ui'
 import type { FacetValue } from '../types/api'
 
-const props = defineProps<{ facets: Record<string, FacetValue[]>; active: Record<string, string> }>()
+const props = defineProps<{ facets: Record<string, FacetValue[]> | null; active: Record<string, string> }>()
 defineEmits<{ select: [key: string, value: string] }>()
 
 const facetLabels: Record<string, string> = {

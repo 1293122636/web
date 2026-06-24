@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; min-height: 100vh;">
+  <n-layout style="display: flex; min-height: 100vh;">
     <n-layout-sider bordered collapse-mode="width" :collapsed-width="64" :width="240" :native-scrollbar="false">
       <div style="padding: 18px 20px 12px;">
         <n-text tag="div" depth="1" style="font-size: 16px; font-weight: 510;">图书馆</n-text>
@@ -24,7 +24,7 @@
     <n-layout-content style="padding: 28px 32px; min-height: 100vh;">
       <router-view />
     </n-layout-content>
-  </div>
+  </n-layout>
 </template>
 
 <script setup lang="ts">
