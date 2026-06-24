@@ -5,7 +5,6 @@
     <n-space vertical :size="24">
       <!-- Circulation Rules -->
       <n-card title="借阅规则">
-        <n-tag type="warning" size="small" style="margin-bottom: 12px;">DESIGN-TODO: 规则矩阵编辑器——读者类型×资料类型交叉编辑。用表格内 NSelect？独立编辑表单？</n-tag>
         <n-data-table
           :columns="ruleColumns"
           :data="rules"

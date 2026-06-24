@@ -68,7 +68,8 @@
 | 2026-06-24 | requireAdmin 中间件替代内联 role 检查 | middleware/requireAdmin.ts，8/8 routes 完成，零内联检查 |
 | 2026-06-24 | Module J 集成测试补全 (49 route tests) | 15 缺口补齐。全 92 tests pass |
 | 2026-06-24 | Module K: MySQL 索引 + 统一错误处理 | 4 索引 (books.title/items.campus/borrows.UserStatus/fines.userId)，setErrorHandler，requireAdmin 8/8 routes |
-| 2026-06-24 | P0-P2 优化 | 路由 reply.send→throw，命名统一 remove→delete/etc，swagger /docs，startup env 校验，Husky 覆盖前端 |
+| 2026-06-24 | Module L: DESIGN-TODO 全部决策 + 实现 | 8 处 DESIGN-TODO 已移除：MyBorrows 欠费总额、Dashboard 借阅动态、Stats 图表、Fines 布局、Books 批量条码+复本展示、Settings 规则矩阵。前端构建通过 |
+| 2026-06-24 | P0-P2 优化 | 路由 reply.send→throw，命名统一，swagger /docs，startup 校验 |
 
 ## 环境变量
 ### 必需变量（backend/.env）

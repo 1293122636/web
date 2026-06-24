@@ -2,8 +2,6 @@
   <div>
     <n-h1 prefix="bar" style="margin-bottom: 20px;"><n-text type="primary">罚款管理</n-text></n-h1>
 
-    <n-tag type="warning" size="small" style="margin-bottom: 12px;">DESIGN-TODO: 罚款管理页面全页面新设计——布局选什么？筛选条件放顶部还是侧边？列表+分页？</n-tag>
-
     <n-space style="margin-bottom: 16px;">
       <n-select v-model:value="filterType" placeholder="类型" clearable :options="typeOptions" style="width: 120px;" @update:value="fetchFines" />
       <n-select v-model:value="filterPaid" placeholder="状态" clearable :options="paidOptions" style="width: 120px;" @update:value="fetchFines" />

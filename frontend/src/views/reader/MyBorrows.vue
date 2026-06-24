@@ -2,7 +2,9 @@
   <div>
     <n-h1 prefix="bar" style="margin-bottom: 20px;"><n-text type="primary">我的借阅</n-text></n-h1>
 
-    <n-tag type="warning" size="small" style="margin-bottom: 8px;">DESIGN-TODO: 欠费总额展示——顶部统计卡片还是列表行内？颜色怎么标？</n-tag>
+    <n-alert v-if="totalFines > 0" type="error" :bordered="false" style="margin-bottom: 16px;">
+      <n-text depth="2">欠费总额：</n-text><n-text type="error" strong>¥{{ totalFines.toFixed(2) }}</n-text>
+    </n-alert>
 
     <n-data-table
       :columns="columns"
@@ -24,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, computed } from 'vue'
 import { useMessage, NTag, NButton } from 'naive-ui'
 import { api } from '../../api'
 import type { DataTableColumns } from 'naive-ui'
@@ -33,6 +35,10 @@ const message = useMessage()
 const records = ref<any[]>([])
 const fines = ref<any[]>([])
 const loading = ref(false)
+
+const totalFines = computed(() =>
+  fines.value.reduce((sum: number, f: any) => sum + (f.paid ? 0 : Number(f.amount)), 0)
+)
 
 const statusMap: Record<string, { type: any; label: string }> = {
   active: { type: 'success', label: '在借' },

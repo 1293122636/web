@@ -48,7 +48,6 @@
 
     <!-- Modal: Add Copy -->
     <n-modal v-model:show="showCopyModal" title="添加复本" preset="card" style="width: 480px;">
-      <n-tag type="warning" size="small" style="margin-bottom: 12px;">DESIGN-TODO: 批量条码号应该怎么输入？每行一个 input？还是点 + 号动态加行？</n-tag>
       <n-form :model="copyForm" label-placement="top">
         <n-form-item label="条码号" required><n-input v-model:value="copyForm.barcode" placeholder="LIB-000001-4" /></n-form-item>
         <n-form-item label="索书号"><n-input v-model:value="copyForm.callNumber" placeholder="TP312/1002" /></n-form-item>
@@ -130,7 +129,6 @@ const ExpandItems = {
     return () => {
       if (items.value.length === 0) return h('div', { style: 'padding:12px;color:#8a8f98;' }, '暂无复本')
       return h('div', { style: 'padding:8px 0;' }, [
-        h(NTag, { type: 'warning', size: 'small', style: 'margin-bottom:8px;' }, () => 'DESIGN-TODO: 复本展示方式——卡片/小表格/列表？条码号用等宽字体？索书号格式？状态标签颜色？'),
         h('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;' }, [
           h('thead', {}, h('tr', {}, [
             h('th', { style: 'text-align:left;padding:4px 12px;color:#8a8f98;' }, '条码号'),

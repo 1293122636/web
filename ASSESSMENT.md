@@ -49,7 +49,7 @@
 
 | Metric | Count |
 |--------|-------|
-| DESIGN-TODO 标记 | 8 处未解决 |
+| DESIGN-TODO 标记 | 0 (8 处全部决策+实现) |
 | Console.log | 1 (`index.ts:71` 服务器启动消息——可接受) |
 | Naive UI 组件使用 | ✅ 全使用 |
 | 暗色主题 | ✅ n-config-provider |
@@ -140,7 +140,7 @@
 | 架构分层 | 9/10 | 四层清晰, Routes→Services→Prisma→MySQL | — |
 | 类型安全 | 6/10 | DTO 全覆盖, Prisma 桥接线 `any` 较多 | — |
 | 数据库设计 | **9/10** | Schema 对齐 OPAC, 5 索引就位 | **+2** |
-| 前端质量 | 6/10 | 组件库完整, 8 个 DESIGN-TODO 未决策 | — |
+| 前端质量 | **8/10** | DESIGN-TODO 全部决策+实现, 组件库完整 | **+2** |
 | 测试覆盖 | **9/10** | Service 100%, 集成 49 cases, E2E 零 | **+2** |
 | 安全性 | **7/10** | Helmet+RateLimit+CORS ✅, JWT refresh 未做 | **+4** |
 | 工程规范 | **9/10** | ESLint+Prettier+Husky+lint-staged+CI ✅ | **+4** |
@@ -168,5 +168,5 @@ Module H 完成后，工程质量发生质变：
 | **I** | Helmet + Rate Limit + CORS | ✅ | 安全性 +4 |
 | **J** | GitHub Actions + 集成测试 (49 cases) | ✅ | 测试 +2, 工程 +1 |
 | **K** | 索引 + setErrorHandler + requireAdmin | ✅ | 数据库 +2, 错误处理 +3 |
-| **L** | DESIGN-TODO + 收尾 | ⏳ | 前端 +2 |
-| **当前总分** | — | — | **8.5/10** |
+| **L** | DESIGN-TODO + 收尾 | ✅ | 前端 +2 |
+| **当前总分** | — | — | **8.7/10** |

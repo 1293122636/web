@@ -12,12 +12,10 @@
 
     <n-space vertical :size="24">
       <n-card title="热门图书 Top 20">
-        <n-tag type="warning" size="small" style="margin-bottom: 8px;">DESIGN-TODO: 柱状图展示借阅量排名</n-tag>
         <n-data-table :columns="popularColumns" :data="popularBooks" :loading="loading" size="small" :row-key="(r: any) => r.id" />
       </n-card>
 
       <n-card title="月度借阅量（近 12 个月）">
-        <n-tag type="warning" size="small" style="margin-bottom:3px;">DESIGN-TODO: 折线图 / 柱状图展示月度趋势，可用 ECharts</n-tag>
         <n-data-table :columns="monthlyColumns" :data="monthlyData" size="small" :row-key="(r: any) => r.month" />
       </n-card>
     </n-space>

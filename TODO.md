@@ -43,8 +43,8 @@
 ### Module L: 收尾
 | # | 任务 | 归属 |
 |---|------|------|
-| 1 | 8 个 DESIGN-TODO 决策 + 实现 | L |
-| 2 | ~~去掉 index.ts 中的 console.log~~ (startup log 可接受, 已评估) | L |
+| 1 | ~~8 个 DESIGN-TODO 决策 + 实现~~ ✅ | L ✅ |
+| 2 | ~~去掉 index.ts 中的 console.log~~ (评估可接受) | L ✅ |
 | 3 | 前端 types 中去 any 化 | L |
 
 ## 已完成 ✅

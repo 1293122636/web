@@ -13,9 +13,6 @@
     </n-grid>
 
     <n-card title="借阅动态" style="margin-top: 16px;">
-      <n-tag type="warning" size="small" style="margin-bottom: 12px;">
-        DESIGN-TODO: 最近借阅动态列表 / 统计图表占位 — 用折线图或柱状图展示月度借阅趋势
-      </n-tag>
       <n-empty description="暂无借阅数据" style="padding: 32px 0;" />
     </n-card>
   </div>

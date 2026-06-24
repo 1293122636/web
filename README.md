@@ -311,7 +311,7 @@ library-full-stack/
 ## 七、设计系统
 
 - **主题：** Naive UI darkTheme，brandColor `#5e6ad2`
-- **DESIGN-TODO 标记：** 8 处（Books 复本面板/加复本批量输入/Borrows 逾期确认/MyBorrows 欠费展示/Fines 页面布局/Settings 矩阵编辑器/Dashboard 图表/Stats 图表）
+- **DESIGN-TODO 标记：** 全部 8 处已决策并实现 (Module L 完成)
 
 ---
 
