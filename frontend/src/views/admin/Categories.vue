@@ -6,7 +6,9 @@
       <n-button type="primary" @click="openCreate">添加分类</n-button>
     </n-space>
 
-    <n-data-table :columns="columns" :data="categories" :loading="loading" :row-key="(r: DataRow) => r.id" />
+    <n-data-table :columns="columns" :data="categories" :loading="loading" :row-key="(r: DataRow) => r.id">
+      <template #empty><n-empty description="暂无分类" /></template>
+    </n-data-table>
 
     <n-modal v-model:show="showModal" :title="editingId ? '编辑分类' : '添加分类'" preset="card" style="width: 420px;">
       <n-form ref="formRef" :model="form" :rules="rulesData">

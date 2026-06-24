@@ -7,7 +7,9 @@
       :data="records"
       :loading="loading"
       :row-key="(r: DataRow) => r.id"
-    />
+    >
+      <template #empty><n-empty description="暂无借阅记录" /></template>
+    </n-data-table>
   </div>
 </template>
 

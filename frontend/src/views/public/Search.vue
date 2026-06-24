@@ -20,9 +20,7 @@
             <span class="result-count">{{ store.total }} 条结果</span>
             <n-pagination v-model:page="store.page" :page-count="totalPages" :page-size="20" @update:page="onPage" />
           </n-space>
-          <n-spin :show="store.loading">
-            <BookGrid :books="store.results" :loading="store.loading" @select="onBookSelect" />
-          </n-spin>
+          <BookGrid :books="store.results" :loading="store.loading" @select="onBookSelect" />
           <n-divider />
           <n-pagination v-model:page="store.page" :page-count="totalPages" :page-size="20" @update:page="onPage" />
         </main>

@@ -12,11 +12,15 @@
 
     <n-space vertical :size="24">
       <n-card title="热门图书 Top 20">
-        <n-data-table :columns="popularColumns" :data="popularBooks" :loading="loading" size="small" :row-key="(r: DataRow) => r.id" />
+        <n-data-table :columns="popularColumns" :data="popularBooks" :loading="loading" size="small" :row-key="(r: DataRow) => r.id">
+          <template #empty><n-empty description="暂无借阅数据" /></template>
+        </n-data-table>
       </n-card>
 
       <n-card title="月度借阅量（近 12 个月）">
-        <n-data-table :columns="monthlyColumns" :data="monthlyData" size="small" :row-key="(r: { month: string }) => r.month" />
+        <n-data-table :columns="monthlyColumns" :data="monthlyData" size="small" :row-key="(r: { month: string }) => r.month">
+          <template #empty><n-empty description="暂无月度数据" /></template>
+        </n-data-table>
       </n-card>
     </n-space>
   </div>

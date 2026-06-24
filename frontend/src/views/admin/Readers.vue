@@ -9,7 +9,9 @@
       :row-key="(r: DataRow) => r.id"
       :expanded-row-keys="expandedKeys"
       @update:expanded-row-keys="onExpand"
-    />
+    >
+      <template #empty><n-empty description="暂无读者" /></template>
+    </n-data-table>
 
     <n-modal v-model:show="showModal" title="编辑读者" preset="card" style="width: 420px;">
       <n-form :model="form">
