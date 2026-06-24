@@ -64,6 +64,7 @@
 | 2026-06-24 | ASSESSMENT.md — 代码质量量化评估 | 加权总分 6.0/10, 骨架完整血肉待补 |
 | 2026-06-24 | ESLint v10 flat config + Prettier + Husky | Module H 完成, 0 errors 95 warnings, pre-commit 拦截 |
 | 2026-06-24 | Helmet + Rate Limit + CORS 白名单 | Module I 完成, 8 security headers, 100/min, localhost-only |
+| 2026-06-24 | CI + 集成测试 (34 route tests) | Module J 完成, GitHub Actions, 8 route files, 77 total tests |
 
 ## 环境变量
 ### 必需变量（backend/.env）

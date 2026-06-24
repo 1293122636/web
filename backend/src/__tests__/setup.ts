@@ -1,20 +1,23 @@
 import { PrismaClient } from '@prisma/client';
-import { beforeEach, afterAll } from 'vitest';
+import { config } from 'dotenv';
+import { beforeAll, afterAll } from 'vitest';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// Test database connection
-const DB = process.env.TEST_DATABASE_URL || 'mysql://root:li200603@127.0.0.1:3306/library_test';
+// Load test env from backend/.env.test
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: ***.test' });
+
+const DB = process.env.DATABASE_URL;
 
 let prisma: PrismaClient;
 
-beforeEach(async () => {
+beforeAll(async () => {
   prisma = new PrismaClient({ datasources: { db: { url: DB } } });
-  // Ensure schema is up to date
-  // Note: in CI, schema is pushed once. For local dev, run `npx prisma db push` before tests.
 });
 
 afterAll(async () => {
-  await prisma?.$disconnect();
+  await prisma?.\();
 });
 
-// Re-export for test use
-export { prisma };
+export { prisma, DB };

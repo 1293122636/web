@@ -30,8 +30,8 @@
 ### Module J: CI + 集成测试
 | # | 任务 | 归属 |
 |---|------|------|
-| 1 | GitHub Actions workflow (lint→test→build) | J |
-| 2 | Fastify inject 集成测试 (8 route files) | J |
+| 1 | GitHub Actions workflow (lint→test→build) | J | ✅ |
+| 2 | Fastify inject 集成测试 (8 route files) | J | ✅ |
 
 ### Module K: 性能优化
 | # | 任务 | 归属 |
