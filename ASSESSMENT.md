@@ -1,17 +1,17 @@
 # Library Full-Stack — Code Quality & Architecture Assessment
 
-> 2026-06-24 | v3.0 — Module I+J complete, reassessed
+> 2026-06-24 | v3.1 — Module J+K+L + M1-M3 complete, P0-P2 audit fixed
 
 ## 一、代码量
 
 | Layer | Lines | Files | avg/File |
 |-------|-------|-------|----------|
-| Routes | 234 | 8 | 29 |
-| Services | 889 | 10 | 89 |
+| Routes | 260 | 9 | 29 |
+| Services | 1,110 | 11 | 101 |
 | Types (backend) | 415 | 2 | 207 |
-| Frontend Total | 2,156 | 28 | 77 |
-| Tests | 1,051 | 17 | 62 |
-| **Total** | **5,307** | **65** | — |
+| Frontend Total | 2,250 | 30 | 75 |
+| Tests | 1,380 | 21 | 66 |
+| **Total** | **5,415** | **73** | — |
 
 ## 二、类型安全
 
@@ -49,13 +49,14 @@
 
 | Metric | Count |
 |--------|-------|
-| DESIGN-TODO 标记 | 1 真正实现 + 7 标签移除 |
+| DESIGN-TODO 标记 | 0 残留 |
 | Console.log | 1 (`index.ts:71` 服务器启动消息——可接受) |
 | Naive UI 组件使用 | ✅ 全使用 |
 | 暗色主题 | ✅ n-config-provider |
+| BarcodeLabel | ✅ JsBarcode CODE128 |
+| Hold 预约 UI | ✅ BookDetail + MyBorrows |
 | 路由守卫 | ✅ beforeEach |
 | Pinia stores | 2 (auth, books) |
-| 响应式图片 | ❌ 未做 |
 | 加载骨架 | SkeletonCard.vue ✅ |
 | 空状态 | EmptyState.vue ✅ |
 
@@ -64,6 +65,7 @@
 | Layer | Files | Tests | PASS | Coverage |
 |-------|-------|-------|------|----------|
 | borrow.service | 1 | 10 | 10 | 100% |
+| hold.service | 1 | 9 | 9 | 100% |
 | auth.service | 1 | 6 | 6 | 100% |
 | book.service | 1 | 7 | 7 | 100% |
 | category.service | 1 | 4 | 4 | 100% |
@@ -72,12 +74,15 @@
 | fine.service | 1 | 3 | 3 | 100% |
 | rule.service | 1 | 3 | 3 | 100% |
 | cover.service | 1 | 3 | 3 | 100% |
-| **Total** | **9** | **43** | **43** | **service: 100%** |
+| **Service subtotal** | **10** | **52** | **52** | **100%** |
+| routes (backend) | 8 | 54 | 54 | 全端点 |
+| frontend components | 4 | 10 | 10 | — |
+| **Total** | **22** | **116** | **116** | — |
 
 缺失:
-- ✅ API 集成测试 (8 route files, 49 cases) — completed Module J
-- ❌ 前端组件测试 (4 components)
 - ❌ E2E 测试
+- ✅ API 集成测试 (already 54 cases)
+- ✅ 前端组件测试 (4 files, 10 tests)
 
 ## 七、安全
 
@@ -160,7 +165,7 @@ Module H 完成后，工程质量发生质变：
 | 工程规范评分 | 5 → 9 (+4) |
 | Prettier 引起的行数变化 | routes +55, services +269 (换行/缩进美化) |
 
-## 十四、Phase 2 剩余模块进度
+## 十四、Phase 2 + M 模块进度
 
 | Module | 内容 | 状态 | 预计提分 |
 |--------|------|------|---------|
@@ -169,4 +174,8 @@ Module H 完成后，工程质量发生质变：
 | **J** | GitHub Actions + 集成测试 (49 cases) | ✅ | 测试 +2, 工程 +1 |
 | **K** | 索引 + setErrorHandler + requireAdmin | ✅ | 数据库 +2, 错误处理 +3 |
 | **L** | DESIGN-TODO + types 去 any | ✅ | 前端 +2 |
+| **M1** | BarcodeLabel.vue + jsbarcode | ✅ | — |
+| **M2** | Hold 预约体系 (5 endpoints + UI) | ✅ | 数据库 +1 |
+| **M3** | 前端组件测试 (10 tests) | ✅ | 测试 +1 |
+| **P0-P2** | 审计修复 (available 计数/复本释放/过期) | ✅ | 数据完整性 |
 | **当前总分** | — | — | **8.5/10** |

@@ -70,6 +70,10 @@
 | 2026-06-24 | Module K: MySQL 索引 + 统一错误处理 | 4 索引 (books.title/items.campus/borrows.UserStatus/fines.userId)，setErrorHandler，requireAdmin 8/8 routes |
 | 2026-06-24 | Module L: types 去 any 化 | 前端 64→3 处 any，新增 ReaderResponse 等类型，api/index.ts 全类型化。构建通过，92 tests pass |
 | 2026-06-24 | P0-P2 优化 | 路由 reply.send→throw，命名统一，swagger /docs，startup 校验 |
+| 2026-06-24 | M1: BarcodeLabel.vue + jsbarcode | CODE128 格式，可配置宽高/字号/显示值 |
+| 2026-06-24 | M2: Hold 预约体系 | 5 端点 + returnBook 联动 + BookDetail/MyBorrows UI |
+| 2026-06-24 | M3: 前端组件测试 | @vue/test-utils + vitest，4 文件 10 tests |
+| 2026-06-24 | P0-P2 审计修复 (M1-M3) | notifyNextHold available 递减、cancelHold 复本释放、fulfillHold item 更新、过期自废、公开 count 端点、测试强化 |
 
 ## 环境变量
 ### 必需变量（backend/.env）
