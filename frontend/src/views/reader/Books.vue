@@ -68,12 +68,12 @@ async function fetchBooks() {
     })
     books.value = res.books
     pagination.itemCount = res.total
-  } catch {}
+  } catch (e) { console.error('fetchBooks failed:', e) }
   loading.value = false
 }
 
 async function fetchCategories() {
-  try { catOptions.value = (await api.get('/categories')).map((c: CategoryResponse) => ({ label: c.name, value: c.id })) } catch {}
+  try { catOptions.value = (await api.get('/categories')).map((c: CategoryResponse) => ({ label: c.name, value: c.id })) } catch (e) { console.error('fetchCategories failed:', e) }
 }
 
 function onPage(page: number) { pagination.page = page; fetchBooks() }

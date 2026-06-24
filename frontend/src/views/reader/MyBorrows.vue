@@ -104,12 +104,12 @@ const holdColumns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchRecords() {
   loading.value = true
-  try { records.value = (await api.get<{ borrows: any[]; total: number }>('/borrows/my')).borrows } catch {}
+  try { records.value = (await api.get<{ borrows: any[]; total: number }>('/borrows/my')).borrows } catch (e) { console.error('fetchRecords failed:', e) }
   loading.value = false
 }
 
 async function fetchFines() {
-  try { fines.value = await api.get('/fines/my') } catch {}
+  try { fines.value = await api.get('/fines/my') } catch (e) { console.error('fetchFines failed:', e) }
 }
 
 async function handleRenew(id: number) {
@@ -118,7 +118,7 @@ async function handleRenew(id: number) {
 }
 
 async function fetchHolds() {
-  try { holds.value = await api.get<HoldResponse[]>('/holds/my') } catch {}
+  try { holds.value = await api.get<HoldResponse[]>('/holds/my') } catch (e) { console.error('fetchHolds failed:', e) }
 }
 
 async function handleCancelHold(id: number) {

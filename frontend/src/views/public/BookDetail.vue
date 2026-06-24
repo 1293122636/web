@@ -66,7 +66,7 @@ onMounted(async () => {
       try {
         const res = await api.get<{ count: number }>('/holds/count?bookId=' + id)
         holdCount.value = res.count ?? 0
-      } catch { holdCount.value = 0 }
+      } catch (e) { console.error('fetchHoldCount failed:', e); holdCount.value = 0 }
     }
   } finally { loading.value = false }
 })

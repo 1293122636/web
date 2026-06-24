@@ -41,6 +41,6 @@ onMounted(async () => {
       { label: '分类数', value: res.totalCategories || 0 },
       { label: '逾期未还', value: res.overdueCount || 0 }
     ]
-  } catch {}
+  } catch (e) { console.error('fetchStats failed:', e) }
 })
 </script>

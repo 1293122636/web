@@ -93,7 +93,7 @@ function playBeep(type: string) {
     const osc = ctx.createOscillator()
     osc.frequency.value = type === 'borrow' ? 880 : 660
     osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.1)
-  } catch {}
+  } catch (e) { console.error('scan failed:', e) }
 }
 </script>
 

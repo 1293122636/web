@@ -70,6 +70,6 @@ onMounted(async () => {
     }
     popularBooks.value = popular || []
     monthlyData.value = monthly || []
-  } catch {}
+  } catch (e) { console.error('fetchStats failed:', e) }
 })
 </script>

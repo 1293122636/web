@@ -124,7 +124,7 @@ const ExpandItems = {
       try {
         const res = await api.get<BookItemsResponse>(`/books/${_props.bookId as number}/items`)
         items.value = res.items || []
-      } catch {}
+      } catch (e) { console.error('loadItems failed:', e) }
     }
     load()
     return () => {
@@ -175,7 +175,7 @@ async function fetchBooks() {
 }
 
 async function fetchCategories() {
-  try { catOptions.value = (await api.get('/categories')).map((c: CategoryResponse) => ({ label: c.name, value: c.id })) } catch {}
+  try { catOptions.value = (await api.get('/categories')).map((c: CategoryResponse) => ({ label: c.name, value: c.id })) } catch (e) { console.error('fetchCategories failed:', e) }
 }
 
 function onPage(page: number) { pagination.page = page; fetchBooks() }

@@ -80,7 +80,7 @@ async function fetchFines() {
     if (filterType.value) params.set('type', filterType.value)
     if (filterPaid.value) params.set('paid', filterPaid.value)
     fines.value = (await api.get<{ fines: FineResponse[]; total: number }>(`/fines?${params}`)).fines
-  } catch {}
+  } catch (e) { console.error('fetchFines failed:', e) }
   loading.value = false
 }
 

@@ -54,7 +54,7 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchCategories() {
   loading.value = true
-  try { categories.value = await api.get('/categories') } catch {}
+  try { categories.value = await api.get('/categories') } catch (e) { console.error('fetchCategories failed:', e) }
   loading.value = false
 }
 

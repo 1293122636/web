@@ -79,7 +79,7 @@ onMounted(async () => {
     rules.value = r
     patronCategories.value = p
     itemTypes.value = i
-  } catch {}
+  } catch (e) { console.error('fetchSettings failed:', e) }
   loading.value = false
 })
 </script>

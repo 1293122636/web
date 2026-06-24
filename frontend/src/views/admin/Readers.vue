@@ -58,7 +58,7 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchReaders() {
   loading.value = true
-  try { readers.value = (await api.get<{ readers: ReaderResponse[]; total: number }>('/readers')).readers } catch {}
+  try { readers.value = (await api.get<{ readers: ReaderResponse[]; total: number }>('/readers')).readers } catch (e) { console.error('fetchReaders failed:', e) }
   loading.value = false
 }
 
@@ -90,7 +90,7 @@ const ExpandPanel = {
       try {
         const res = await api.get<ReaderResponse>(`/readers/${props.readerId}`)
         records.value = res.borrowRecords || []
-      } catch {}
+      } catch (e) { console.error('loadReader failed:', e) }
     }
     load()
     return () => records.value.length === 0
