@@ -136,17 +136,9 @@ app.register(bookItemRoutes, { prefix: '/api/book-items' });
 // Health check
 app.get('/api/health', async () => ({ status: 'ok' }));
 
-// Barcode lookup (Module F)
-app.get('/api/book-items/:barcode', async (request: any) => {
-  const item = await prisma.bookItem.findUnique({
-    where: { barcode: request.params.barcode },
-    include: { book: true },
-  });
-  if (!item) throw Object.assign(new Error('Item not found'), { statusCode: 404 });
-  const currentBorrow = await prisma.borrowRecord.findFirst({
-    where: { bookItemId: item.id, status: 'active' },
-  });
-  return { item, currentBorrow };
+// Root redirect to frontend
+app.get('/', async (_request: any, reply: any) => {
+  return reply.redirect('http://localhost:5173');
 });
 
 // Start
