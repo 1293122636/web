@@ -630,3 +630,179 @@ GET /api/book-items/:barcode
 2. API 响应变化 = 回退、找原因
 3. 构建失败 = 不进下一步
 4. 发现问题先修当前模块，不"记下来以后改"
+
+---
+
+## Phase 2: 工程卓越（六维度补全）
+
+> Phase 1 (Module A-G) = 骨架完成。Phase 2 = 血肉补全。
+
+### 现状评估（六维度）
+
+| 维度 | 得分 | 关键缺口 |
+|------|------|---------|
+| 架构分层 | ✅ 做到 | — |
+| 工程规范 | ⚠️ 一半 | ESLint/Prettier/Husky 未配 |
+| 数据状态 | ⚠️ 一半 | 无请求缓存 (SWR等效) |
+| 质量防线 | ⚠️ 刚起步 | CI/CD 未建, 集成/E2E 测试为零 |
+| 安全性能 | ❌ 大部分缺 | helmet/rate-limit/CORS 白名单/索引 |
+| 可观测性 | ❌ 零 | requestId 未加 |
+
+### 不做的事（学生项目过重）
+
+| 不做的 | 原因 |
+|--------|------|
+| Redis 缓存 | 单机 MySQL 已满足, P95 < 50ms |
+| Sentry/Prometheus/Grafana | 无运维环境 |
+| Playwright E2E | 太重, 已用手动 checklist |
+| JWT refresh token | 单页面应用, 过期重登即可 |
+| GraphQL | RESTful 够用 |
+
+### Module H: 工程化工具链 (1h)
+
+**目标**: 统一代码风格, 提交前自动格式化。
+
+```
+backend/ + frontend/
+├── .eslintrc.js           ← ESLint 配置 (TypeScript + Vue)
+├── .prettierrc             ← Prettier 配置 (2 space, single quote)
+├── .editorconfig           ← 编辑器统一
+├── .husky/
+│   └── pre-commit          ← lint-staged → eslint --fix + prettier --write
+└── commitlint.config.js    ← Conventional Commits 校验
+```
+
+**验证**: 故意写一个 `console.log` → `git commit` → Husky 拦截 → 自动修复。
+
+- [ ] `npm run lint` 通过
+- [ ] `git commit` 自动格式化
+- [ ] commit message 不规范时拦截
+
+### Module I: 安全加固 (1h)
+
+**目标**: 生产环境必备的 4 项安全措施。
+
+| 文件 | 内容 |
+|------|------|
+| `backend/src/index.ts` | `@fastify/helmet` — XSS/CSRF/clickjacking 头 |
+| `backend/src/index.ts` | `@fastify/rate-limit` — 100 req/min per IP |
+| `backend/src/index.ts` | CORS: `origin: ['http://localhost:5173']` (禁止 `true` 全放) |
+| `backend/.env.example` | 已有, 验证必需变量完整性 |
+
+**验证**: `curl -I` 检查 security headers。
+
+- [ ] `X-Content-Type-Options: nosniff`
+- [ ] `X-Frame-Options: DENY`
+- [ ] rate-limit 超限返回 429
+- [ ] CORS 限制生效
+
+### Module J: 质量防线 (2h)
+
+**目标**: CI 自动化 + 集成测试。
+
+**J1. GitHub Actions**
+
+```
+.github/workflows/ci.yml
+  on: [push, pull_request]
+  jobs:
+    lint:    eslint + prettier --check
+    test:    vitest run (backend) + vitest run (frontend)
+    build:   tsc --noEmit (backend) + vite build (frontend)
+```
+
+**J2. API 集成测试 (Fastify inject)**
+
+```typescript
+// __tests__/routes/auth.test.ts
+// 无需启动真实 HTTP — Fastify inject() 直接测
+it('POST /api/auth/login — 正确密码返回 token', async () => {
+  const app = await buildApp()
+  const res = await app.inject({ method: 'POST', url: '/api/auth/login', payload: {...} })
+  expect(res.statusCode).toBe(200)
+  expect(res.json().token).toBeDefined()
+})
+```
+
+**覆盖 8 个路由文件, ~24 个用例:**
+- auth (login/register/me), books (list/detail/items), borrows (borrow/return/renew)
+- categories (crud), readers (list/detail), stats (overview/popular), fines (list/pay), rules (list/upsert)
+
+**验证**:
+- [ ] GitHub Actions 绿灯
+- [ ] `npm test` 包含集成测试
+- [ ] PR 时自动跑 CI
+
+### Module K: 性能优化 (1h)
+
+**目标**: MySQL 索引 + 查询优化。
+
+| 操作 | 文件 | SQL |
+|------|------|-----|
+| campus 过滤 | schema.prisma | `@@index([campus])` on BookItem |
+| barcode 查询 | 已有 | UNIQUE 已有 |
+| borrowRecord 查询 | schema.prisma | `@@index([userId, status])` |
+| book 搜索 | schema.prisma | `@@index([title])` on Book |
+| fine 查询 | schema.prisma | `@@index([userId])` |
+
+**验证**:
+```bash
+EXPLAIN SELECT * FROM book_items WHERE campus = '青岛';  -- key: campus_idx
+time curl /api/books/facets  # P95 < 150ms
+```
+
+- [ ] 4 个关键索引创建
+- [ ] facets API P95 < 150ms
+- [ ] books list P95 < 50ms
+
+### Module L: 收尾 (1.5h)
+
+**L1. 15 DESIGN-TODOs 全部决策**
+
+| # | 位置 | 决策 |
+|---|------|------|
+| 9 | 封面占位图 | CSS 渐变色 + 书名首字 ✅ 已实现 |
+| 10 | 复本状态颜色 | StatusBadge 四色方案 ✅ 已实现 |
+| 12-15 | 流通台 | 已实现 |
+
+剩余 11 项逐项决策并写入代码, 去掉所有 NTag 黄标。
+
+**L2. Step 10: 还书→预约联动**
+
+```typescript
+// borrow.service.ts — returnBook() 末尾 +15行
+// 还书成功 → 查 pending holds → 队首变 ready → 站内通知
+```
+
+**L3. BarcodeLabel.vue**
+
+`npm install jsbarcode` → 条码 SVG 生成组件。
+
+---
+
+### 总时间 (Phase 2)
+
+| Module | 内容 | 时间 |
+|--------|------|------|
+| H | ESLint/Prettier/Husky | 1h |
+| I | helmet/rate-limit/CORS | 1h |
+| J | CI + 集成测试 (24用例) | 2h |
+| K | MySQL 索引 + 查询优化 | 1h |
+| L | DESIGN-TODOs + 预约联动 + BarcodeLabel | 1.5h |
+| **合计** | | **6.5h** |
+
+### 完整交付标准 (Phase 1 + Phase 2 全过)
+
+```
+✅ 四层架构 (routes/services/Prisma/MySQL)
+✅ 43 单元测试 + 24 集成测试 = 67 测试
+✅ CI/CD 绿灯 (lint → test → build)
+✅ 安全头 + 速率限制
+✅ MySQL 索引
+✅ 15 DESIGN-TODOs 全部解决
+✅ 预约联动
+✅ 流通台
+✅ 零裸调 Prisma
+✅ 零硬编码
+✅ ESLint/Prettier 格式化通过
+```
