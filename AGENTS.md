@@ -74,6 +74,7 @@
 | 2026-06-24 | M2: Hold 预约体系 | 5 端点 + returnBook 联动 + BookDetail/MyBorrows UI |
 | 2026-06-24 | M3: 前端组件测试 | @vue/test-utils + vitest，4 文件 10 tests |
 | 2026-06-24 | P0-P2 审计修复 (M1-M3) | notifyNextHold available 递减、cancelHold 复本释放、fulfillHold item 更新、过期自废、公开 count 端点、测试强化 |
+| 2026-06-24 | 第六轮全代码审计 (12 fixes) | Search bare fetch→store, BookDetail request→bookApi, token→hasToken(), rules dead code, admin any[]→typed, alert→useMessage, requireAdmin as any→typed, api barrel re-export |
 
 ## 环境变量
 ### 必需变量（backend/.env）
