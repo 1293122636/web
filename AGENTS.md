@@ -77,6 +77,11 @@
 | 2026-06-24 | 第六轮全代码审计 (12 fixes) | Search bare fetch→store, BookDetail request→bookApi, token→hasToken(), rules dead code, admin any[]→typed, alert→useMessage, requireAdmin as any→typed, api barrel re-export |
 | 2026-06-24 | 第七轮全代码审计 (17 fixes) | P0 Circulation 还书 bug, BookListResponse data→books, HoldResponse 重写, listFines 分页, 11 处 any→typed, menu补circulation, reader/Books→bookApi, facets as any→typed |
 | 2026-06-24 | 第八轮专项审计 (12 fixes) | hold cancel/fulfill/expire 三处加 $transaction, ASSESSMENT.md 全量更新(any/error/counts), borrow targetBookId guard, PLAN fines.ts→fine.service.ts |
+| 2026-06-24 | 第九轮质量升级 | 测试 2→7+2→5 强断言, 15 处 catch{}→console.error, 零静默吞错 |
+| 2026-06-24 | 第十轮收尾 | reconcileBookAvailable → POST /:id/reconcile route |
+| 2026-06-24 | 第十一轮竞态修复 | borrow() 交互式 $transaction 防最后一册并发, holds POST Zod 校验 |
+| 2026-06-24 | 第十二轮数据防护 | book.remove() copies+borrows 双重防护, Hold FK onDelete SetNull, 错误消息中→英统一 |
+| 2026-06-24 | 第十三轮缺失端点 | /api/book-items/:barcode 路由——流通台扫码从未实现 |
 
 ## 环境变量
 ### 必需变量（backend/.env）
@@ -187,6 +192,9 @@
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|------|------|
 | GET | /api/health | public | 健康检查 |
+| **新增 (R10-R13 审计)** |
+| POST | /api/books/:id/reconcile | admin | 对账可用计数 |
+| GET | /api/book-items/:barcode | public | 按条码查复本 (流通台扫码) |
 
 ### API 文档生成
 - 安装 `@fastify/swagger` + `@fastify/swagger-ui`

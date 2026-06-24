@@ -1,17 +1,17 @@
 # Library Full-Stack — Code Quality & Architecture Assessment
 
-> 2026-06-24 | v3.2 — Module H-M complete, Rounds 1-8 audit all fixed
+> 2026-06-24 | v3.3 — 13-round audit complete, 82 fixes, 40 API endpoints
 
 ## 一、代码量
 
 | Layer | Lines | Files | avg/File |
 |-------|-------|-------|----------|
-| Routes | 260 | 9 | 29 |
-| Services | 1,110 | 11 | 101 |
-| Types (backend) | 415 | 2 | 207 |
-| Frontend Total | 2,250 | 30 | 75 |
-| Tests | 1,380 | 21 | 66 |
-| **Total** | **5,415** | **73** | — |
+| Routes | 310 | 10 | 31 |
+| Services | 1,350 | 11 | 123 |
+| Types (backend) | 420 | 2 | 210 |
+| Frontend Total | 2,300 | 30 | 77 |
+| Tests | 1,450 | 21 | 69 |
+| **Total** | **5,830** | **74** | — |
 
 ## 二、类型安全
 
@@ -22,7 +22,7 @@
 | `any` in tests | 26 | ✅ vi.mock 的 prisma 实例，mock 专用 |
 | `any` in frontend | 0 | ✅ 全部 typed (Rounds 6-7) |
 | `as unknown as` casts | 21 | ⚠️ Prisma 返回类型与 DTO 类型桥接 |
-| DTO interfaces | 40 | ✅ 覆盖全部 38 API 端点 |
+| DTO interfaces | 40 | ✅ 覆盖全部 40 API 端点 |
 | TSC errors | 10 | ⚠️ 测试 mock 类型 + book.service 隐式 any + fine Decimal 转换 |
 | `BookListResponse` → type alias | ✅ | Module H 修复：空 interface → type 别名，通过 no-empty-object-type |
 
@@ -176,6 +176,6 @@ Module H 完成后，工程质量发生质变：
 | **L** | DESIGN-TODO + types 去 any | ✅ | 前端 +2 |
 | **M1** | BarcodeLabel.vue + jsbarcode | ✅ | — |
 | **M2** | Hold 预约体系 (5 endpoints + UI) | ✅ | 数据库 +1 |
-| **M3** | 前端组件测试 (10 tests) | ✅ | 测试 +1 |
-| **P0-P2** | 审计修复 (available 计数/复本释放/过期) | ✅ | 数据完整性 |
+| **M3** | 前端组件测试 (10→18 tests) | ✅ | 测试 +1 |
+| **R1-R13** | 十三轮全代码审计 (82 fixes) | ✅ | 数据完整性/类型安全/竞态/一致性/测试质量 |
 | **当前总分** | — | — | **8.5/10** |
