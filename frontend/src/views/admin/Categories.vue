@@ -27,10 +27,11 @@
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NButton, NPopconfirm } from 'naive-ui'
 import { api } from '../../api'
+import type { CategoryResponse, DataRow } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const categories = ref<any[]>([])
+const categories = ref<CategoryResponse[]>([])
 const loading = ref(false)
 
 const columns: DataTableColumns<Record<string, unknown>> = [

@@ -149,7 +149,7 @@ const ExpandItems = {
                 const labels: Record<string, string> = { available: '在架', borrowed: '借出', repairing: '修补', lost: '遗失', withdrawn: '剔除' }
                 return labels[i.status] || i.status
               })),
-              h('td', { style: 'padding:6px 12px;color:#8a8f98;' }, ({ normal: '正常', damaged: '破损', repairing: '修补中', lost: '遗失', withdrawn: '剔除' } as any)[i.condition] || i.condition),
+              h('td', { style: 'padding:6px 12px;color:#8a8f98;' }, ({ normal: '正常', damaged: '破损', repairing: '修补中', lost: '遗失', withdrawn: '剔除' } as Record<string, string>)[i.condition] || i.condition),
               h('td', { style: 'padding:6px 12px;text-align:right;color:#d0d6e0;' }, i.price ? `¥${i.price}` : '-')
             ])
           }))

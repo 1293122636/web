@@ -35,7 +35,7 @@ describe('Fines Integration', () => {
   it('GET /api/fines — admin can list all fines', async () => {
     const res = await app.inject({ method: 'GET', url: '/api/fines', headers: authHeaders(adminToken) });
     expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.json())).toBe(true);
+    expect(Array.isArray(res.json().fines)).toBe(true);
   });
 
   it('GET /api/fines/my — reader can see own fines', async () => {

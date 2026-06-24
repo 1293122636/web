@@ -70,7 +70,7 @@ async function handleLogin() {
     message.success('登录成功')
     router.push(res.user.role === 'admin' ? '/admin/dashboard' : '/reader/books')
   } catch (e: unknown) {
-    message.error(e.message || '登录失败')
+    message.error((e as Error).message || '登录失败')
   } finally {
     loading.value = false
   }
@@ -97,7 +97,7 @@ async function handleRegister() {
     message.success('注册成功')
     router.push('/reader/books')
   } catch (e: unknown) {
-    message.error(e.message || '注册失败')
+    message.error((e as Error).message || '注册失败')
   } finally {
     regLoading.value = false
   }

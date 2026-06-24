@@ -114,7 +114,13 @@ export interface BookDetail extends BookSummary {
   electronicResources?: string[];
 }
 
-export type BookListResponse = PaginatedResponse<BookSummary>;
+export interface BookListResponse {
+  books: BookSummary[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
 
 export interface BookCreateParams {
   isbn: string;
@@ -292,6 +298,8 @@ export type FineType = 'overdue' | 'lost' | 'damage';
 export interface FineListParams {
   type?: FineType;
   paid?: boolean;
+  page?: number;
+  limit?: number;
 }
 
 export interface FineSummary {
@@ -380,20 +388,19 @@ export interface FacetsResponse {
 // Hold (Module G 新增)
 // ══════════════════════════════════════════════════════════════
 
-export type HoldStatus = 'pending' | 'waiting' | 'ready' | 'cancelled' | 'expired';
+export type HoldStatus = 'pending' | 'ready' | 'fulfilled' | 'expired' | 'cancelled';
 
 export interface HoldResponse {
   id: number;
   userId: number;
-  bookItemId: number;
-  placedAt: string;
-  expiresAt?: string | null;
-  pickupLocation?: string | null;
+  bookId: number;
+  bookItemId: number | null;
   status: HoldStatus;
-  queuePosition: number;
-  notifiedAt?: string | null;
-  bookItem: BookItemSummary;
-  user: { id: number; name: string; username: string };
+  requestDate: string;
+  expiryDate: string | null;
+  fulfilledAt: string | null;
+  book?: { id: number; title: string; author: string; isbn: string };
+  user?: { id: number; username: string; name: string };
 }
 
 // ══════════════════════════════════════════════════════════════

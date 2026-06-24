@@ -43,9 +43,9 @@ import type { DataTableColumns } from 'naive-ui'
 import { api } from '../../api'
 import type { CirculationRuleResponse, PatronCategoryResponse, ItemTypeResponse } from '../../types/api'
 
-const rules = ref<any[]>([])
-const patronCategories = ref<any[]>([])
-const itemTypes = ref<any[]>([])
+const rules = ref<CirculationRuleResponse[]>([])
+const patronCategories = ref<PatronCategoryResponse[]>([])
+const itemTypes = ref<ItemTypeResponse[]>([])
 const loading = ref(false)
 
 const ruleColumns: DataTableColumns<Record<string, unknown>> = [

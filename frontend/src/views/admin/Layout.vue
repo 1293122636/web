@@ -44,6 +44,7 @@ const menuOptions: MenuOption[] = [
   { label: '借阅管理', key: '/admin/borrows', icon: () => '📋' },
   { label: '罚款管理', key: '/admin/fines', icon: () => '💰' },
   { label: '统计报表', key: '/admin/stats', icon: () => '📈' },
+  { label: '流通台', key: '/admin/circulation', icon: () => '🔄' },
   { label: '系统设置', key: '/admin/settings', icon: () => '⚙️' }
 ]
 

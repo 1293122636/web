@@ -15,6 +15,8 @@ export async function finesRoutes(app: FastifyInstance) {
     return fineService.listFines(app.prisma, {
       type: filters.type,
       paid: filters.paid !== undefined ? filters.paid === 'true' : undefined,
+      page: parseInt(request.query.page as string) || 1,
+      limit: parseInt(request.query.limit as string) || 20,
     });
   });
 

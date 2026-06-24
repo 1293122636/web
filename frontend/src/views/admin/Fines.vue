@@ -21,10 +21,11 @@
 import { ref, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton } from 'naive-ui'
 import { api } from '../../api'
+import type { FineResponse, DataRow } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const fines = ref<any[]>([])
+const fines = ref<FineResponse[]>([])
 const loading = ref(false)
 const filterType = ref<string | null>(null)
 const filterPaid = ref<string | null>(null)
@@ -78,7 +79,7 @@ async function fetchFines() {
     const params = new URLSearchParams()
     if (filterType.value) params.set('type', filterType.value)
     if (filterPaid.value) params.set('paid', filterPaid.value)
-    fines.value = await api.get(`/fines?${params}`)
+    fines.value = (await api.get<{ fines: FineResponse[]; total: number }>(`/fines?${params}`)).fines
   } catch {}
   loading.value = false
 }

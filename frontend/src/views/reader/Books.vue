@@ -25,12 +25,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton } from 'naive-ui'
-import { api } from '../../api'
-import type { BookListResponse, CategoryResponse } from '../../types/api'
+import { api, bookApi } from '../../api'
+import type { BookListResponse, BookSummary, CategoryResponse, DataRow } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const books = ref<any[]>([])
+const books = ref<BookSummary[]>([])
 const loading = ref(false)
 const search = ref('')
 const filterCategory = ref<number | null>(null)
@@ -60,10 +60,12 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 async function fetchBooks() {
   loading.value = true
   try {
-    const params = new URLSearchParams({ page: String(pagination.page), limit: String(pagination.pageSize) })
-    if (search.value) params.set('search', search.value)
-    if (filterCategory.value) params.set('categoryId', String(filterCategory.value))
-    const res = await api.get<BookListResponse>(`/books?${params}`)
+    const res = await bookApi.list({
+      page: pagination.page,
+      limit: pagination.pageSize,
+      search: search.value || undefined,
+      categoryId: filterCategory.value ?? undefined,
+    })
     books.value = res.books
     pagination.itemCount = res.total
   } catch {}

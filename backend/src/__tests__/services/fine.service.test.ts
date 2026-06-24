@@ -3,7 +3,7 @@ import * as fineService from '../../services/fine.service.js';
 
 function mockPrisma() {
   return {
-    fine: { findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
+    fine: { findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn(), count: vi.fn() },
     user: { update: vi.fn() },
     $transaction: vi.fn((ops: Promise<any>[]) => Promise.all(ops)),
     auditLog: { create: vi.fn().mockResolvedValue({}) },
@@ -14,8 +14,9 @@ describe('listFines', () => {
   it('按类型筛选', async () => {
     const prisma = mockPrisma();
     prisma.fine.findMany.mockResolvedValue([{ id: 1, type: 'overdue', amount: 5 }]);
+    prisma.fine.count.mockResolvedValue(1);
     const result = await fineService.listFines(prisma, { type: 'overdue' });
-    expect(result).toHaveLength(1);
+    expect(result.fines).toHaveLength(1);
   });
 });
 

@@ -149,20 +149,20 @@ export async function getFacets(
       where: { ...itemWhere, campus: { not: null } },
       _count: true,
       orderBy: { campus: 'desc' },
-    }) as any,
+    }) as unknown as { campus: string | null; _count: number }[],
     prisma.bookItem.groupBy({
       by: ['location'],
       where: { ...itemWhere, location: { not: null } },
       _count: true,
       orderBy: { location: 'desc' },
-    }) as any,
+    }) as unknown as { location: string | null; _count: number }[],
     prisma.book.groupBy({
       by: ['language'],
       where: { ...where, language: { not: null } },
       _count: true,
       orderBy: { language: 'desc' },
-    }) as any,
-    prisma.book.groupBy({ by: ['categoryId'], where, _count: true }) as any,
+    }) as unknown as { language: string; _count: number }[],
+    prisma.book.groupBy({ by: ['categoryId'], where, _count: true }) as unknown as { categoryId: number; _count: number }[],
   ]);
 
   const catIds = subjects.map((s) => s.categoryId);

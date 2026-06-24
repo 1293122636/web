@@ -65,7 +65,7 @@ async function onScan(barcode: string) {
 
 function addToQueue(action: string) {
   if (!currentItem.value) return
-  queue.value.push({ action, barcode: currentItem.value.barcode, item: currentItem.value })
+  queue.value.push({ action, barcode: currentItem.value.barcode, item: currentItem.value, currentBorrow: currentBorrow.value })
   currentItem.value = null
   currentBorrow.value = null
 }

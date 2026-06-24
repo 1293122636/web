@@ -36,7 +36,7 @@ import type { ReaderResponse, BorrowRecordResponse } from '../../types/api'
 import type { DataTableColumns } from 'naive-ui'
 
 const message = useMessage()
-const readers = ref<any[]>([])
+const readers = ref<ReaderResponse[]>([])
 const loading = ref(false)
 const expandedKeys = ref<number[]>([])
 
@@ -58,7 +58,7 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchReaders() {
   loading.value = true
-  try { readers.value = (await api.get<{ readers: any[]; total: number }>('/readers')).readers } catch {}
+  try { readers.value = (await api.get<{ readers: ReaderResponse[]; total: number }>('/readers')).readers } catch {}
   loading.value = false
 }
 

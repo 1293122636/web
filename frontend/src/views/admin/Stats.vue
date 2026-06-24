@@ -36,8 +36,8 @@ const statCards = ref([
   { label: '逾期未还', value: 0 }
 ])
 
-const popularBooks = ref<any[]>([])
-const monthlyData = ref<any[]>([])
+const popularBooks = ref<PopularBook[]>([])
+const monthlyData = ref<MonthlyStat[]>([])
 const loading = ref(false)
 
 const popularColumns: DataTableColumns<Record<string, unknown>> = [

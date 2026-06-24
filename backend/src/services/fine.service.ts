@@ -17,19 +17,26 @@ async function audit(
 export async function listFines(
   prisma: PrismaClient,
   filters: FineListParams,
-): Promise<FineResponse[]> {
+): Promise<{ fines: FineResponse[]; total: number }> {
   const where: Record<string, unknown> = {};
   if (filters.type) where.type = filters.type;
   if (filters.paid !== undefined) where.paid = filters.paid;
-  return prisma.fine.findMany({
-    where,
-    include: {
-      user: { select: { id: true, username: true, name: true } },
-      borrowRecord: { select: { id: true, book: { select: { title: true } } } },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-  }) as unknown as FineResponse[];
+  const page = Math.max(1, filters.page || 1);
+  const limit = Math.min(100, Math.max(1, filters.limit || 20));
+  const [fines, total] = await Promise.all([
+    prisma.fine.findMany({
+      where,
+      include: {
+        user: { select: { id: true, username: true, name: true } },
+        borrowRecord: { select: { id: true, book: { select: { title: true } } } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.fine.count({ where }),
+  ]);
+  return { fines: fines as unknown as FineResponse[], total };
 }
 
 export async function getMyFines(prisma: PrismaClient, userId: number): Promise<FineResponse[]> {
