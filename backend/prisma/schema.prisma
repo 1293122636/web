@@ -242,7 +242,7 @@ model Hold {
   bookId      Int
   book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
   bookItemId  Int?
-  bookItem    BookItem? @relation(fields: [bookItemId], references: [id])
+  bookItem    BookItem? @relation(fields: [bookItemId], references: [id], onDelete: SetNull)
   status      String    @default("pending") @db.VarChar(20) // pending/ready/fulfilled/expired/cancelled
   requestDate DateTime  @default(now()) @map("request_date")
   expiryDate  DateTime? @map("expiry_date")

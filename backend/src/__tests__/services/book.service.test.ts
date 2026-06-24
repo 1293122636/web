@@ -12,7 +12,8 @@ function mockPrisma(overrides: Record<string, any> = {}) {
       delete: vi.fn(),
       groupBy: vi.fn(),
     },
-    bookItem: { findMany: vi.fn(), groupBy: vi.fn() },
+    bookItem: { findMany: vi.fn(), groupBy: vi.fn(), count: vi.fn() },
+    borrowRecord: { count: vi.fn() },
     category: { findMany: vi.fn() },
     ...overrides,
   } as any;
@@ -94,6 +95,8 @@ describe('update', () => {
 describe('delete', () => {
   it('7. 删除 — 调用 prisma.book.delete', async () => {
     const prisma = mockPrisma();
+    prisma.bookItem.count.mockResolvedValue(0); // no copies
+    prisma.borrowRecord.count.mockResolvedValue(0); // no active borrows
     prisma.book.delete.mockResolvedValue({});
 
     await bookService.remove(prisma, 1);

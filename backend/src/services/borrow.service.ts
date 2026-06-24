@@ -135,7 +135,7 @@ export async function borrow(
     });
     if (currentCount >= rule.maxBorrows) {
       throw Object.assign(
-        new Error(`已达到借阅上限 ${rule.maxBorrows} 册`),
+        new Error(`Borrow limit exceeded: max ${rule.maxBorrows}`),
         { statusCode: 400 },
       );
     }

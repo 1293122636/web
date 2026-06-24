@@ -129,7 +129,7 @@ describe('borrow', () => {
     prisma.user.findUnique = vi.fn().mockResolvedValue({ id: 1, patronCategoryId: 1 });
 
     await expect(borrowService.borrow(prisma, 1, { bookId: 10, bookItemId: 1 })).rejects.toThrow(
-      '已达到借阅上限',
+      'Borrow limit exceeded',
     );
   });
 

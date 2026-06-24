@@ -120,6 +120,10 @@ export async function update(
 }
 
 export async function remove(prisma: PrismaClient, id: number): Promise<void> {
+  const count = await prisma.bookItem.count({ where: { bookId: id } });
+  if (count > 0) throw Object.assign(new Error(`Cannot delete book with ${count} existing copies`), { statusCode: 400 });
+  const activeBorrows = await prisma.borrowRecord.count({ where: { bookId: id, status: 'active' } });
+  if (activeBorrows > 0) throw Object.assign(new Error(`Cannot delete book with ${activeBorrows} active borrows`), { statusCode: 400 });
   await prisma.book.delete({ where: { id } });
 }
 
