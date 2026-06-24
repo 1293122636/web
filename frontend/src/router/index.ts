@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getUser, clearAuth } from '../api'
 
 const routes = [
-  { path: '/', redirect: '/login' },
+  { path: '/', redirect: '/books' },
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue') },
+  { path: '/books', name: 'Search', component: () => import('../views/public/Search.vue') },
+  { path: '/books/:id', name: 'BookDetail', component: () => import('../views/public/BookDetail.vue') },
   {
     path: '/admin',
     component: () => import('../views/admin/Layout.vue'),
@@ -40,8 +42,9 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const user = getUser()
-  if (to.path === '/login') {
-    if (user) {
+  // Public routes — no auth required
+  if (to.path === '/login' || to.path === '/books' || to.path.startsWith('/books/')) {
+    if (to.path === '/login' && user) {
       next(user.role === 'admin' ? '/admin/dashboard' : '/reader/books')
     } else {
       next()
