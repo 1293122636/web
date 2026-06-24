@@ -16,9 +16,9 @@
 ### Module H: 工程化工具链
 | # | 任务 | 归属 |
 |---|------|------|
-| 1 | ESLint 配置 (.eslintrc.js) | H |
-| 2 | Prettier 配置 (.prettierrc) | H |
-| 3 | Husky + lint-staged (pre-commit hook) | H |
+| 1 | ESLint 配置 (.eslintrc.js) | H | ✅ |
+| 2 | Prettier 配置 (.prettierrc) | H | ✅ |
+| 3 | Husky + lint-staged (pre-commit hook) | H | ✅ |
 
 ### Module I: 安全加固
 | # | 任务 | 归属 |
