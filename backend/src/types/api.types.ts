@@ -217,10 +217,11 @@ export interface BorrowRecordResponse {
 }
 
 export interface ReturnResult {
-  id: number;
-  status: string;
-  returnDate: string;
-  fine: { amount: number; type: string } | null;
+  id: number
+  status: string
+  returnDate: string
+  fine: { amount: number; type: string } | null
+  holdPromoted?: { holdId: number; userId: number } | null
 }
 
 export interface RenewResult {

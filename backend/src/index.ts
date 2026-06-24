@@ -14,6 +14,7 @@ import { readerRoutes } from './routes/readers.js';
 import { statsRoutes } from './routes/stats.js';
 import { finesRoutes } from './routes/fines.js';
 import { rulesRoutes } from './routes/rules.js';
+import { holdRoutes } from './routes/holds.js';
 
 const prisma = new PrismaClient();
 const app = Fastify({ logger: true });
@@ -125,6 +126,7 @@ app.register(readerRoutes, { prefix: '/api/readers' });
 app.register(statsRoutes, { prefix: '/api/stats' });
 app.register(finesRoutes, { prefix: '/api/fines' });
 app.register(rulesRoutes, { prefix: '/api/admin/rules' });
+app.register(holdRoutes, { prefix: '/api/holds' });
 
 // Health check
 app.get('/api/health', async () => ({ status: 'ok' }));

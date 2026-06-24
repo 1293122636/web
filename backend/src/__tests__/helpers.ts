@@ -12,6 +12,7 @@ import { readerRoutes } from '../routes/readers.js';
 import { statsRoutes } from '../routes/stats.js';
 import { finesRoutes } from '../routes/fines.js';
 import { rulesRoutes } from '../routes/rules.js';
+import { holdRoutes } from '../routes/holds.js';
 
 const S = 'test-secret-key-at-least-32-chars-long';
 
@@ -44,6 +45,7 @@ export async function buildApp(prisma: PrismaClient) {
   await app.register(statsRoutes, { prefix: '/api/stats' });
   await app.register(finesRoutes, { prefix: '/api/fines' });
   await app.register(rulesRoutes, { prefix: '/api/admin/rules' });
+  await app.register(holdRoutes, { prefix: '/api/holds' });
 
   app.get('/api/health', async () => ({ status: 'ok' }));
   app.get('/api/book-items/:barcode', async (request: any, reply: any) => {

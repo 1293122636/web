@@ -73,6 +73,7 @@ model User {
 
   borrowRecords BorrowRecord[]
   fines         Fine[]
+  holds         Hold[]
 
   @@map("users")
 }
@@ -151,6 +152,7 @@ model Book {
 
   items         BookItem[]
   borrowRecords BorrowRecord[]
+  holds         Hold[]
 
   @@index([title])
   @@map("books")
@@ -177,6 +179,7 @@ model BookItem {
   itemType   ItemType @relation(fields: [itemTypeId], references: [id])
 
   borrowRecords BorrowRecord[]
+  holds         Hold[]
 
   @@index([campus])
   @@map("book_items")
@@ -213,9 +216,9 @@ model BorrowRecord {
 
 model Fine {
   id         Int       @id @default(autoincrement())
-  amount     Decimal   @db.Decimal(10, 2)                     // 金额
-  paid       Boolean   @default(false)                        // 是否已缴
-  paidAt     DateTime? @map("paid_at")                        // 缴费时间
+  amount     Decimal   @db.Decimal(10, 2)
+  paid       Boolean   @default(false)
+  paidAt     DateTime? @map("paid_at")
   createdAt  DateTime  @default(now()) @map("created_at")
 
   borrowRecordId Int
@@ -228,4 +231,26 @@ model Fine {
 
   @@index([userId])
   @@map("fines")
+}
+
+// ============ 预约体系 ============
+
+model Hold {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId      Int
+  book        Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookItemId  Int?
+  bookItem    BookItem? @relation(fields: [bookItemId], references: [id])
+  status      String    @default("pending") @db.VarChar(20) // pending/ready/fulfilled/expired/cancelled
+  requestDate DateTime  @default(now()) @map("request_date")
+  expiryDate  DateTime? @map("expiry_date")
+  fulfilledAt DateTime? @map("fulfilled_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([bookId, status])
+  @@index([bookItemId, status])
+  @@map("holds")
 }

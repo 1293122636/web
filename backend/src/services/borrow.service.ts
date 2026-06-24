@@ -1,12 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 import type {
   BorrowParams,
   BorrowRecordResponse,
   ReturnResult,
   RenewResult,
-} from '../types/api.types.js';
-import { getRule, checkBorrowLimit } from './rules.js';
-import { createFine, calcOverdueFine } from './fines.js';
+} from '../types/api.types.js'
+import { getRule, checkBorrowLimit } from './rules.js'
+import { createFine, calcOverdueFine } from './fines.js'
+import { getNextPendingHold } from './hold.service.js'
 
 export async function getMyBorrows(
   prisma: PrismaClient,
@@ -160,7 +161,33 @@ export async function returnBook(
     status: isOverdue ? 'overdue' : 'returned',
     returnDate: now.toISOString(),
     fine: fineResult ? { amount: fineResult.amount, type: fineResult.type } : null,
+    holdPromoted: await notifyNextHold(prisma, record.bookId, record.bookItemId),
   };
+}
+
+async function notifyNextHold(
+  prisma: PrismaClient,
+  bookId: number,
+  bookItemId: number | null,
+): Promise<{ holdId: number; userId: number } | null> {
+  const nextHold = await getNextPendingHold(prisma, bookId)
+  if (!nextHold || !bookItemId) return null
+
+  const expiry = new Date()
+  expiry.setDate(expiry.getDate() + 3) // 3-day pickup window
+
+  await prisma.hold.update({
+    where: { id: nextHold.id },
+    data: { status: 'ready', bookItemId, expiryDate: expiry },
+  })
+
+  // Set item to on_hold status
+  await prisma.bookItem.update({
+    where: { id: bookItemId },
+    data: { status: 'on_hold' },
+  })
+
+  return { holdId: nextHold.id, userId: nextHold.userId }
 }
 
 export async function renew(

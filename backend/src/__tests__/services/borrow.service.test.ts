@@ -4,6 +4,10 @@ import * as rules from '../../services/rules.js';
 import * as fines from '../../services/fines.js';
 
 // Mock dependencies
+vi.mock('../../services/hold.service.js', () => ({
+  getNextPendingHold: vi.fn().mockResolvedValue(null),
+}))
+
 vi.mock('../../services/rules.js', () => ({
   getRule: vi.fn(),
   checkBorrowLimit: vi.fn(),
