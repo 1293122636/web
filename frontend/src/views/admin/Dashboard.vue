@@ -60,16 +60,17 @@
               <n-tag size="small" type="info">40</n-tag>
             </n-descriptions-item>
             <n-descriptions-item label="测试覆盖">
-              <n-tag size="small" type="success">70/70 通过</n-tag>
+              <n-tag size="small" type="success">51/51 通过</n-tag>
             </n-descriptions-item>
             <n-descriptions-item label="构建状态">
               <n-tag size="small" type="success">✅ PASS</n-tag>
             </n-descriptions-item>
             <n-descriptions-item label="框架版本">
               <n-space size="small">
+                <n-tag size="tiny">Spring Boot 3.2</n-tag>
+                <n-tag size="tiny">MyBatis 3.0</n-tag>
                 <n-tag size="tiny">Vue 3.5</n-tag>
-                <n-tag size="tiny">Fastify 5</n-tag>
-                <n-tag size="tiny">Prisma 5</n-tag>
+                <n-tag size="tiny">Naive UI 2.44</n-tag>
               </n-space>
             </n-descriptions-item>
           </n-descriptions>
@@ -87,8 +88,7 @@ import {
   SwapHorizontalOutline, ScanOutline, BarChartOutline, FlashOutline,
   InformationCircleOutline
 } from '@vicons/ionicons5'
-import { api } from '../../api'
-import type { StatsOverviewResponse } from '../../types/api'
+import api from '@/api'
 
 const colors = ['#5e6ad2', '#f0a020', '#18a058', '#2080f0', '#d03050']
 const icons = [LibraryOutline, SwapHorizontalOutline, PeopleOutline, GridOutline, AlertCircleOutline]
@@ -103,13 +103,13 @@ const stats = ref([
 
 onMounted(async () => {
   try {
-    const res = await api.get<StatsOverviewResponse>('/stats')
+    const { data } = await api.get('/stats')
     stats.value = [
-      { label: '总藏书', value: res.totalBooks || 0 },
-      { label: '在借数量', value: res.activeBorrows || 0 },
-      { label: '读者总数', value: res.totalReaders || 0 },
-      { label: '分类数', value: res.totalCategories || 0 },
-      { label: '逾期未还', value: res.overdueCount || 0 }
+      { label: '总藏书', value: data.totalBooks || 0 },
+      { label: '在借数量', value: data.activeBorrows || 0 },
+      { label: '读者总数', value: data.totalReaders || 0 },
+      { label: '分类数', value: data.totalCategories || 0 },
+      { label: '逾期未还', value: data.overdueCount || 0 }
     ]
   } catch (e) { console.error('fetchStats failed:', e) }
 })
@@ -122,7 +122,6 @@ onMounted(async () => {
 .page-title {
   font-size: 22px; font-weight: 700; color: var(--n-text-color); margin: 0;
 }
-
 .stat-card {
   position: relative; overflow: hidden;
   background: var(--n-card-color); border-radius: 12px;
@@ -147,10 +146,8 @@ onMounted(async () => {
   position: absolute; top: -20px; right: -20px; width: 100px; height: 100px;
   pointer-events: none; border-radius: 50%;
 }
-
 .panel-card { height: 100%; }
 .panel-header { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; }
-
 .quick-actions { display: flex; flex-direction: column; gap: 4px; }
 .action-item {
   display: flex; align-items: center; gap: 14px; padding: 10px 12px;

@@ -16,7 +16,7 @@
       :loading="loading"
       :pagination="pagination"
       remote
-      :row-key="(r: DataRow) => r.id"
+      :row-key="(r: any) => r.id"
       @update:page="onPage"
     />
   </div>
@@ -25,19 +25,19 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton } from 'naive-ui'
-import { api, bookApi } from '../../api'
-import type { BookListResponse, BookSummary, CategoryResponse, DataRow } from '../../types/api'
-import type { DataTableColumns } from 'naive-ui'
+import api from '@/api'
+import { bookApi } from '@/api/books'
+import type { DataTableColumn } from 'naive-ui'
 
 const message = useMessage()
-const books = ref<BookSummary[]>([])
+const books = ref<any[]>([])
 const loading = ref(false)
 const search = ref('')
 const filterCategory = ref<number | null>(null)
 const catOptions = ref<{ label: string; value: number }[]>([])
 const pagination = reactive({ page: 1, pageSize: 20, itemCount: 0 })
 
-const columns: DataTableColumns<Record<string, unknown>> = [
+const columns: DataTableColumn[] = [
   { title: '书名', key: 'title', ellipsis: { tooltip: true } },
   { title: '作者', key: 'author', width: 120 },
   { title: '分类', key: 'category.name', width: 100 },
@@ -45,11 +45,11 @@ const columns: DataTableColumns<Record<string, unknown>> = [
   { title: '年份', key: 'year', width: 60 },
   {
     title: '库存', key: 'available', width: 70,
-    render: (r) => h(NTag, { type: r.available > 0 ? 'success' : 'error', size: 'small' }, () => `${r.available}/${r.total}`)
+    render: (r: any) => h(NTag, { type: r.available > 0 ? 'success' : 'error', size: 'small' }, () => `${r.available}/${r.total}`)
   },
   {
     title: '操作', key: 'actions', width: 90,
-    render(row) {
+    render(row: any) {
       return row.available > 0
         ? h(NButton, { size: 'small', type: 'primary', onClick: () => handleBorrow(row) }, () => '借阅')
         : h(NTag, { type: 'default', size: 'small' }, () => '已借完')
@@ -60,25 +60,28 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 async function fetchBooks() {
   loading.value = true
   try {
-    const res = await bookApi.list({
+    const { data } = await bookApi.list({
       page: pagination.page,
       limit: pagination.pageSize,
       search: search.value || undefined,
       categoryId: filterCategory.value ?? undefined,
     })
-    books.value = res.books
-    pagination.itemCount = res.total
-  } catch (e) { console.error('fetchBooks failed:', e) }
+    books.value = data.books || []
+    pagination.itemCount = data.total || 0
+  } catch { /* ignore */ }
   loading.value = false
 }
 
 async function fetchCategories() {
-  try { catOptions.value = (await api.get('/categories')).map((c: CategoryResponse) => ({ label: c.name, value: c.id })) } catch (e) { console.error('fetchCategories failed:', e) }
+  try {
+    const { data } = await api.get('/categories')
+    catOptions.value = (data || []).map((c: any) => ({ label: c.name, value: c.id }))
+  } catch { /* ignore */ }
 }
 
 function onPage(page: number) { pagination.page = page; fetchBooks() }
 
-async function handleBorrow(row: DataRow) {
+async function handleBorrow(row: any) {
   try {
     await api.post('/borrows/borrow', { bookId: row.id })
     message.success(`已借阅《${row.title}》`)

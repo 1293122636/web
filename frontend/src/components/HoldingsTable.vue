@@ -8,7 +8,7 @@ import { NDataTable } from 'naive-ui'
 import StatusBadge from './StatusBadge.vue'
 import type { BookItemSummary } from '../types/api'
 
-const props = defineProps<{ items: BookItemSummary[] }>()
+defineProps<{ items: BookItemSummary[] }>()
 
 const columns = [
   { title: '序号', key: 'index', width: 60, render: (_: any, __: number) => __ + 1 },

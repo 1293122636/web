@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { bookApi } from '../api/books'
-import type { BookSummary, BookDetail, BookListParams, FacetValue, FacetsResponse } from '../types/api'
+import type { BookSummary, BookDetail, BookListParams, FacetsResponse } from '../types/api'
 
 export const useBookStore = defineStore('books', () => {
   const results = ref<BookSummary[]>([])
@@ -19,11 +19,11 @@ export const useBookStore = defineStore('books', () => {
     searchQuery.value = params.search || ''
     activeFilters.value = params
     try {
-      const res = await bookApi.list({ ...params, page: page.value, limit: limit.value })
-      results.value = res.books
-      total.value = res.total
-      page.value = res.page
-      limit.value = res.limit
+      const { data } = await bookApi.list({ ...params, page: page.value, limit: limit.value })
+      results.value = data.books || []
+      total.value = data.total || 0
+      page.value = data.page || 1
+      limit.value = data.limit || 20
     } finally { loading.value = false }
   }
 
@@ -34,15 +34,20 @@ export const useBookStore = defineStore('books', () => {
 
   async function updateFacets(params: BookListParams = {}) {
     try {
-      const res = await bookApi.getFacets(params)
-      facets.value = res.facets
+      const { data } = await bookApi.getFacets(params)
+      facets.value = data.facets || null
     } catch {
       facets.value = null
     }
   }
 
   async function getBook(id: number) {
-    currentBook.value = await bookApi.getById(id)
+    try {
+      const { data } = await bookApi.getById(id)
+      currentBook.value = data
+    } catch {
+      currentBook.value = null
+    }
   }
 
   async function applyFilter(filter: Partial<BookListParams>) {

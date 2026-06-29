@@ -1,7 +1,6 @@
 <template>
   <div>
     <n-h1 prefix="bar" style="margin-bottom: 20px;"><n-text type="primary">个人信息</n-text></n-h1>
-
     <n-card style="max-width: 480px;">
       <n-spin :show="loading">
         <n-form :model="form" label-placement="top">
@@ -29,8 +28,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
-import { api } from '../../api'
-import type { UserProfile } from '../../types/api'
+import api from '@/api'
+import type { UserProfile } from '@/types/api'
 
 const message = useMessage()
 const loading = ref(false)
@@ -40,8 +39,8 @@ const form = reactive({ username: '', role: '', name: '', phone: '', email: '', 
 onMounted(async () => {
   loading.value = true
   try {
-    const res = await api.get<UserProfile>('/auth/me')
-    Object.assign(form, res)
+    const { data } = await api.get<UserProfile>('/auth/me')
+    Object.assign(form, data)
   } catch { message.error('获取信息失败') }
   loading.value = false
 })

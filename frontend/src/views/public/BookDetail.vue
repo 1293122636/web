@@ -58,10 +58,10 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { NIcon } from 'naive-ui'
-import { ArrowBackOutline, PersonOutline, BookOutline, TimeOutline } from '@vicons/ionicons5'
 import { useMessage } from 'naive-ui'
+import { ArrowBackOutline, PersonOutline, BookOutline, TimeOutline } from '@vicons/ionicons5'
 import HoldingsTable from '../../components/HoldingsTable.vue'
-import { api, bookApi } from '../../api'
+import api, { bookApi } from '../../api'
 import type { BookDetail } from '../../types/api'
 
 const route = useRoute()
@@ -74,12 +74,13 @@ function hasToken() { return !!localStorage.getItem('token') }
 
 onMounted(async () => {
   const id = Number(route.params.id)
+  loading.value = true
   try {
-    book.value = await bookApi.getById(id)
+    book.value = (await bookApi.getById(id)).data
     if (book.value && book.value.available === 0) {
       try {
-        const res = await api.get<{ count: number }>('/holds/count?bookId=' + id)
-        holdCount.value = res.count ?? 0
+        const res = await api.get('/holds/count', { params: { bookId: id } })
+        holdCount.value = res.data?.count ?? 0
       } catch (e) { console.error('fetchHoldCount failed:', e); holdCount.value = 0 }
     }
   } finally { loading.value = false }
@@ -89,7 +90,6 @@ function handleBorrow() {
   if (!hasToken()) { window.location.href = '/login'; return }
   window.location.href = '/reader/books'
 }
-
 async function handleHold() {
   if (!hasToken()) { window.location.href = '/login'; return }
   if (!book.value) return

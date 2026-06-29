@@ -1,6 +1,4 @@
-// Frontend type mirrors of backend DTOs
-// Keep these in sync with backend/src/types/api.types.ts
-
+// Frontend types — mirrors Java backend DTOs
 export interface PaginationParams { page?: number; limit?: number }
 export interface PaginatedResponse<T> { data: T[]; total: number; page: number; limit: number; pages: number }
 
@@ -22,7 +20,7 @@ export interface BookDetail extends BookSummary { items?: BookItemSummary[] }
 export interface BookListResponse { books: BookSummary[]; total: number; page: number; limit: number; pages: number }
 export interface BookListParams extends PaginationParams {
   search?: string; categoryId?: number
-  campus?: string; yearMin?: number; yearMax?: number; language?: string
+  campus?: string; yearMin?: number; yearMax?: number; language?: string; sortBy?: string
 }
 
 export interface BookItemSummary {
@@ -32,7 +30,7 @@ export interface BookItemSummary {
 }
 export interface BookItemsResponse { book: { id: number; title: string; isbn: string }; items: BookItemSummary[] }
 
-export interface CategoryResponse { id: number; name: string; desc?: string | null; _count?: { books: number } }
+export interface CategoryResponse { id: number; name: string; desc?: string | null; booksCount?: number }
 
 export interface BorrowRecordResponse {
   id: number; userId: number; bookId: number; borrowDate: string; dueDate: string

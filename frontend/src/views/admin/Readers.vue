@@ -6,12 +6,10 @@
       :columns="columns"
       :data="readers"
       :loading="loading"
-      :row-key="(r: DataRow) => r.id"
+      :row-key="(r: any) => r.id"
       :expanded-row-keys="expandedKeys"
       @update:expanded-row-keys="onExpand"
-    >
-      <template #empty><n-empty description="暂无读者" /></template>
-    </n-data-table>
+    />
 
     <n-modal v-model:show="showModal" title="编辑读者" preset="card" style="width: 420px;">
       <n-form :model="form">
@@ -30,29 +28,26 @@
 </template>
 
 <script setup lang="ts">
-import type { DataRow } from '../../types/api'
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NButton, NTag } from 'naive-ui'
-import { api } from '../../api'
-import type { ReaderResponse, BorrowRecordResponse } from '../../types/api'
-import type { DataTableColumns } from 'naive-ui'
+import api from '@/api'
+import type { DataTableColumn } from 'naive-ui'
 
 const message = useMessage()
-const readers = ref<ReaderResponse[]>([])
+const readers = ref<any[]>([])
 const loading = ref(false)
 const expandedKeys = ref<number[]>([])
 
-const columns: DataTableColumns<Record<string, unknown>> = [
-  { type: 'expand', renderExpand: (row) => h(ExpandPanel, { readerId: row.id }) },
+const columns: DataTableColumn[] = [
+  { type: 'expand' as any, renderExpand: (row: any) => h(ExpandPanel, { readerId: row.id }) },
   { title: '用户名', key: 'username', width: 120 },
   { title: '姓名', key: 'name', width: 100 },
   { title: '手机', key: 'phone', width: 130 },
   { title: '邮箱', key: 'email', ellipsis: { tooltip: true } },
-  { title: '借阅数', key: '_count.borrowRecords', width: 70 },
-  { title: '注册时间', key: 'createdAt', width: 160, render: (r) => new Date(r.createdAt).toLocaleDateString('zh-CN') },
+  { title: '注册时间', key: 'createdAt', width: 160, render: (r: any) => new Date(r.createdAt).toLocaleDateString('zh-CN') },
   {
     title: '操作', key: 'actions', width: 80,
-    render(row) {
+    render(row: any) {
       return h(NButton, { size: 'small', onClick: () => openEdit(row) }, () => '编辑')
     }
   }
@@ -60,7 +55,10 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchReaders() {
   loading.value = true
-  try { readers.value = (await api.get<{ readers: ReaderResponse[]; total: number }>('/readers')).readers } catch (e) { console.error('fetchReaders failed:', e) }
+  try {
+    const { data } = await api.get('/readers')
+    readers.value = data || []
+  } catch { /* ignore */ }
   loading.value = false
 }
 
@@ -70,35 +68,33 @@ const showModal = ref(false)
 const saving = ref(false)
 const form = reactive<{ id: number | null; name: string; phone: string; email: string }>({ id: null, name: '', phone: '', email: '' })
 
-function openEdit(row: DataRow) { Object.assign(form, { id: row.id, name: row.name, phone: row.phone, email: row.email }); showModal.value = true }
+function openEdit(row: any) { Object.assign(form, { id: row.id, name: row.name, phone: row.phone, email: row.email }); showModal.value = true }
 
 async function handleSave() {
   saving.value = true
   try {
     await api.put(`/readers/${form.id}`, { name: form.name, phone: form.phone, email: form.email })
     message.success('已更新')
-    showModal.value = false
-    fetchReaders()
+    showModal.value = false; fetchReaders()
   } catch (e: unknown) { message.error((e as Error).message) }
   saving.value = false
 }
 
-// Expand panel component (inline)
 const ExpandPanel = {
   props: { readerId: Number },
-  setup(props: Record<string, unknown>) {
-    const records = ref<BorrowRecordResponse[]>([])
+  setup(props: any) {
+    const records = ref<any[]>([])
     const load = async () => {
       try {
-        const res = await api.get<ReaderResponse>(`/readers/${props.readerId}`)
-        records.value = res.borrowRecords || []
-      } catch (e) { console.error('loadReader failed:', e) }
+        const { data } = await api.get(`/readers/${props.readerId}`)
+        records.value = data.borrowRecords || []
+      } catch { /* ignore */ }
     }
     load()
     return () => records.value.length === 0
       ? h('div', { style: 'padding:12px;color:#8a8f98;' }, '暂无借阅记录')
       : h('div', { style: 'padding:8px 0;' },
-          records.value.map((r: BorrowRecordResponse) =>
+          records.value.map((r: any) =>
             h('div', { style: 'display:flex;gap:16px;padding:6px 12px;font-size:13px;color:#d0d6e0;' }, [
               h('span', r.book?.title || '未知'),
               h('span', { style: 'color:#8a8f98;' }, new Date(r.borrowDate).toLocaleDateString('zh-CN')),

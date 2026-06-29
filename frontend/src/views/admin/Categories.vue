@@ -6,9 +6,7 @@
       <n-button type="primary" @click="openCreate">添加分类</n-button>
     </n-space>
 
-    <n-data-table :columns="columns" :data="categories" :loading="loading" :row-key="(r: DataRow) => r.id">
-      <template #empty><n-empty description="暂无分类" /></template>
-    </n-data-table>
+    <n-data-table :columns="columns" :data="categories" :loading="loading" :row-key="(r: any) => r.id" />
 
     <n-modal v-model:show="showModal" :title="editingId ? '编辑分类' : '添加分类'" preset="card" style="width: 420px;">
       <n-form ref="formRef" :model="form" :rules="rulesData">
@@ -28,21 +26,20 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue'
 import { useMessage, NButton, NPopconfirm } from 'naive-ui'
-import { api } from '../../api'
-import type { CategoryResponse, DataRow } from '../../types/api'
-import type { DataTableColumns } from 'naive-ui'
+import api from '@/api'
+import type { DataTableColumn } from 'naive-ui'
 
 const message = useMessage()
-const categories = ref<CategoryResponse[]>([])
+const categories = ref<any[]>([])
 const loading = ref(false)
 
-const columns: DataTableColumns<Record<string, unknown>> = [
+const columns: DataTableColumn[] = [
   { title: '名称', key: 'name', width: 200 },
   { title: '描述', key: 'desc', ellipsis: { tooltip: true } },
-  { title: '图书数', key: '_count.books', width: 80 },
+  { title: '图书数', key: 'booksCount', width: 80 },
   {
     title: '操作', key: 'actions', width: 140,
-    render(row) {
+    render(row: any) {
       return h('div', { style: 'display:flex;gap:8px' }, [
         h(NButton, { size: 'small', onClick: () => openEdit(row) }, () => '编辑'),
         h(NPopconfirm, { onPositiveClick: () => handleDelete(row.id) }, {
@@ -56,7 +53,10 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 
 async function fetchCategories() {
   loading.value = true
-  try { categories.value = await api.get('/categories') } catch (e) { console.error('fetchCategories failed:', e) }
+  try {
+    const { data } = await api.get('/categories')
+    categories.value = data || []
+  } catch { /* ignore */ }
   loading.value = false
 }
 
@@ -67,7 +67,7 @@ const form = reactive({ name: '', desc: '' })
 const rulesData = { name: [{ required: true, message: '必填' }] }
 
 function openCreate() { editingId.value = null; form.name = ''; form.desc = ''; showModal.value = true }
-function openEdit(row: DataRow) { editingId.value = row.id; form.name = row.name; form.desc = row.desc || ''; showModal.value = true }
+function openEdit(row: any) { editingId.value = row.id; form.name = row.name; form.desc = row.desc || ''; showModal.value = true }
 
 async function handleSave() {
   saving.value = true

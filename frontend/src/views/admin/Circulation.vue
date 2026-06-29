@@ -27,7 +27,7 @@
             <n-list-item v-for="(op, i) in queue" :key="i">
               <n-space align="center">
                 <n-tag :type="op.action === 'borrow' ? 'success' : 'warning'" size="small">{{ op.action === 'borrow' ? '借' : '还' }}</n-tag>
-                <span>{{ op.item?.book?.title }} ({{ op.barcode }})</span>
+                <span>{{ op.bookName }} ({{ op.barcode }})</span>
                 <n-button text size="tiny" @click="queue.splice(i,1)">✕</n-button>
               </n-space>
             </n-list-item>
@@ -47,7 +47,7 @@ import { ref } from 'vue'
 import { NH2, NGrid, NGridItem, NCard, NDescriptions, NDescriptionsItem, NButton, NSpace, NTag, NList, NListItem, NDivider, useMessage } from 'naive-ui'
 import BarcodeInput from '../../components/BarcodeInput.vue'
 import StatusBadge from '../../components/StatusBadge.vue'
-import { request } from '../../api'
+import api from '../../api'
 
 const message = useMessage()
 const currentItem = ref<any>(null)
@@ -56,8 +56,8 @@ const queue = ref<any[]>([])
 
 async function onScan(barcode: string) {
   try {
-    const data = await request<any>(`/api/book-items/${encodeURIComponent(barcode)}`)
-    currentItem.value = data.item
+    const { data } = await api.get(`/book-items/${encodeURIComponent(barcode)}`)
+    currentItem.value = data
     currentBorrow.value = data.currentBorrow
     playBeep(data.currentBorrow ? 'return' : 'borrow')
   } catch { message.error('条码未找到') }
@@ -65,7 +65,13 @@ async function onScan(barcode: string) {
 
 function addToQueue(action: string) {
   if (!currentItem.value) return
-  queue.value.push({ action, barcode: currentItem.value.barcode, item: currentItem.value, currentBorrow: currentBorrow.value })
+  queue.value.push({
+    action,
+    barcode: currentItem.value.barcode,
+    bookName: currentItem.value.bookName,
+    itemId: currentItem.value.id,
+    currentBorrowId: currentBorrow.value?.id
+  })
   currentItem.value = null
   currentBorrow.value = null
 }
@@ -76,9 +82,9 @@ async function commitAll() {
   for (const op of queue.value) {
     try {
       if (op.action === 'borrow') {
-        await request('/api/borrows/borrow', { method: 'POST', body: { bookItemId: op.item.id }, auth: true })
+        await api.post('/borrows/borrow', { bookItemId: op.itemId })
       } else {
-        const data = await request<any>(`/api/borrows/return/${op.currentBorrow?.id}`, { method: 'POST', auth: true })
+        const { data } = await api.post(`/borrows/return/${op.currentBorrowId}`)
         if (data.fine) message.warning(`逾期罚款: ¥${data.fine.amount}`)
       }
       message.success(op.action === 'borrow' ? '借书成功' : '还书成功')
@@ -93,7 +99,7 @@ function playBeep(type: string) {
     const osc = ctx.createOscillator()
     osc.frequency.value = type === 'borrow' ? 880 : 660
     osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.1)
-  } catch (e) { console.error('scan failed:', e) }
+  } catch { /* beep failed silently */ }
 }
 </script>
 

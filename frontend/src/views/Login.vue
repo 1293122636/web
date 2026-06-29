@@ -11,9 +11,7 @@
           </div>
         </div>
         <div class="logo-area">
-          <!-- SDUST Badge -->
           <img class="school-badge" src="https://www.sdust.edu.cn/web202504/images/xqlogo3.png" width="72" height="72" alt="山东科技大学" />
-
           <div class="brand-text">
             <h1 class="brand-title">图书馆管理系统</h1>
             <p class="brand-subtitle">SHANDONG UNIVERSITY OF SCIENCE AND TECHNOLOGY</p>
@@ -52,15 +50,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage, NIcon, darkTheme } from 'naive-ui'
 import { PersonOutline, LockClosedOutline } from '@vicons/ionicons5'
-import { api, setAuth } from '../api'
+import api, { setAuth } from '../api'
 import LoginBg from '../components/LoginBg.vue'
+import type { LoginResponse, UserProfile } from '../types/api'
 const router = useRouter(); const message = useMessage()
 const form = ref({ username: '', password: '' }); const loading = ref(false)
 const rules = { username: [{ required: true, message: '请输入用户名' }], password: [{ required: true, message: '请输入密码' }] }
 async function handleLogin() {
   if (!form.value.username || !form.value.password) { message.warning('请输入用户名和密码'); return }
   loading.value = true
-  try { const res = await api.login(form.value.username, form.value.password); setAuth(res.user, res.token); message.success('登录成功'); router.push(res.user.role === 'admin' ? '/admin/dashboard' : '/reader/books') }
+  try { const { data } = await api.post<LoginResponse>('/auth/login', form.value); setAuth(data.user, data.token); message.success('登录成功'); router.push(data.user.role === 'admin' ? '/admin/dashboard' : '/reader/books') }
   catch (e: unknown) { message.error((e as Error).message || '登录失败') } finally { loading.value = false }
 }
 const showRegister = ref(false); const regLoading = ref(false)
@@ -69,7 +68,7 @@ const regRules = { username: [{ required: true, message: '请输入用户名' }]
 async function handleRegister() {
   if (!reg.value.username || !reg.value.password || !reg.value.name) { message.warning('请填写必填项'); return }
   regLoading.value = true
-  try { const res = await api.register(reg.value); setAuth(res.user, res.token); showRegister.value = false; message.success('注册成功'); router.push('/reader/books') }
+  try { const { data } = await api.post<LoginResponse>('/auth/register', reg.value); setAuth(data.user, data.token); showRegister.value = false; message.success('注册成功'); router.push('/reader/books') }
   catch (e: unknown) { message.error((e as Error).message || '注册失败') } finally { regLoading.value = false }
 }
 </script>
@@ -105,7 +104,6 @@ async function handleRegister() {
   font-weight: 300;
 }
 .register-link { display: block; text-align: center; margin-top: 18px; font-size: 13px; cursor: pointer; }
-
 .back-bar {
   display: flex; justify-content: flex-start; margin-bottom: 4px;
 }
@@ -129,9 +127,7 @@ async function handleRegister() {
   color: rgba(255,255,255,0.6);
   transition: transform 0.25s ease;
 }
-.back-btn:hover .back-arrow {
-  transform: translateX(-4px);
-}
+.back-btn:hover .back-arrow { transform: translateX(-4px); }
 .back-text {
   font-size: 13px; font-weight: 500;
   color: rgba(255,255,255,0.7);

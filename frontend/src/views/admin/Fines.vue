@@ -12,22 +12,19 @@
       :columns="columns"
       :data="fines"
       :loading="loading"
-      :row-key="(r: DataRow) => r.id"
-    >
-      <template #empty><n-empty description="暂无罚款记录" /></template>
-    </n-data-table>
+      :row-key="(r: any) => r.id"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue'
 import { useMessage, NTag, NButton } from 'naive-ui'
-import { api } from '../../api'
-import type { FineResponse, DataRow } from '../../types/api'
-import type { DataTableColumns } from 'naive-ui'
+import api from '@/api'
+import type { DataTableColumn } from 'naive-ui'
 
 const message = useMessage()
-const fines = ref<FineResponse[]>([])
+const fines = ref<any[]>([])
 const loading = ref(false)
 const filterType = ref<string | null>(null)
 const filterPaid = ref<string | null>(null)
@@ -42,33 +39,33 @@ const paidOptions = [
   { label: '已缴', value: 'true' }
 ]
 
-const columns: DataTableColumns<Record<string, unknown>> = [
+const columns: DataTableColumn[] = [
   { title: '读者', key: 'user.name', width: 100 },
   { title: '图书', key: 'borrowRecord.book.title', ellipsis: { tooltip: true } },
-  { title: '金额', key: 'amount', width: 100, render: (r) => `¥${r.amount}` },
+  { title: '金额', key: 'amount', width: 100, render: (r: any) => `¥${r.amount}` },
   {
     title: '类型', key: 'type', width: 70,
-    render(row) {
+    render(row: any) {
       const m: Record<string, { type: 'success' | 'warning' | 'error' | 'info' | 'default'; label: string }> = {
         overdue: { type: 'error', label: '逾期' },
         lost: { type: 'warning', label: '遗失' },
         damage: { type: 'info', label: '破损' }
       }
-      const s = m[row.type] || { type: 'default', label: row.type }
+      const s = m[row.type] || { type: 'default' as const, label: row.type }
       return h(NTag, { type: s.type, size: 'small' }, () => s.label)
     }
   },
   {
     title: '状态', key: 'paid', width: 70,
-    render(row) {
+    render(row: any) {
       return h(NTag, { type: row.paid ? 'success' : 'error', size: 'small' }, () => row.paid ? '已缴' : '未缴')
     }
   },
-  { title: '创建时间', key: 'createdAt', width: 160, render: (r) => new Date(r.createdAt).toLocaleString('zh-CN') },
-  { title: '缴费时间', key: 'paidAt', width: 160, render: (r) => r.paidAt ? new Date(r.paidAt).toLocaleString('zh-CN') : '-' },
+  { title: '创建时间', key: 'createdAt', width: 160, render: (r: any) => new Date(r.createdAt).toLocaleString('zh-CN') },
+  { title: '缴费时间', key: 'paidAt', width: 160, render: (r: any) => r.paidAt ? new Date(r.paidAt).toLocaleString('zh-CN') : '-' },
   {
     title: '操作', key: 'actions', width: 80,
-    render(row) {
+    render(row: any) {
       if (row.paid) return ''
       return h(NButton, { size: 'small', type: 'success', onClick: () => handlePay(row.id) }, () => '缴费')
     }
@@ -78,11 +75,12 @@ const columns: DataTableColumns<Record<string, unknown>> = [
 async function fetchFines() {
   loading.value = true
   try {
-    const params = new URLSearchParams()
-    if (filterType.value) params.set('type', filterType.value)
-    if (filterPaid.value) params.set('paid', filterPaid.value)
-    fines.value = (await api.get<{ fines: FineResponse[]; total: number }>(`/fines?${params}`)).fines
-  } catch (e) { console.error('fetchFines failed:', e) }
+    const params: any = {}
+    if (filterType.value) params.type = filterType.value
+    if (filterPaid.value) params.paid = filterPaid.value
+    const { data } = await api.get('/fines', { params })
+    fines.value = data || []
+  } catch { /* ignore */ }
   loading.value = false
 }
 

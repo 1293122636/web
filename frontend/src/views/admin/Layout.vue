@@ -2,20 +2,18 @@
   <n-layout has-sider style="display: flex; min-height: 100vh;">
     <n-layout-sider bordered class="admin-sider" collapse-mode="width" :collapsed-width="64" :width="240" :native-scrollbar="false">
       <div class="logo">
-          <svg class="logo-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            <line x1="8" y1="7" x2="16" y2="7"/>
-            <line x1="8" y1="11" x2="14" y2="11"/>
-          </svg>
+        <svg class="logo-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <line x1="8" y1="7" x2="16" y2="7"/>
+          <line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
         <div>
           <n-text tag="div" style="font-size: 16px; font-weight: 600; color: #e8e8f0; letter-spacing: 0.3px;">图书馆管理</n-text>
           <n-text tag="div" style="font-size: 11px; color: #7a7a9a; letter-spacing: 0.5px; text-transform: uppercase;">ADMIN</n-text>
         </div>
       </div>
-
       <div class="sider-divider"></div>
-
       <n-menu
         inverted
         :value="activeKey"
@@ -24,7 +22,6 @@
         :indent="12"
         @update:value="handleMenu"
       />
-
       <div class="footer">
         <n-button text @click="handleLogout" style="width: 100%; color: #8888a0;">
           <template #icon><n-icon><LogOutOutline /></n-icon></template>
@@ -32,7 +29,6 @@
         </n-button>
       </div>
     </n-layout-sider>
-
     <n-layout-content class="content">
       <router-view />
     </n-layout-content>
@@ -48,11 +44,12 @@ import {
   SwapHorizontalOutline, CashOutline, BarChartOutline, SettingsOutline,
   CameraOutline, LogOutOutline
 } from '@vicons/ionicons5'
-import { clearAuth } from '../../api'
+import { useAuthStore } from '@/stores/auth'
 import type { MenuOption } from 'naive-ui'
 
 const router = useRouter()
 const route = useRoute()
+const auth = useAuthStore()
 
 const renderIcon = (icon: any) => () => h(NIcon, null, () => h(icon))
 
@@ -74,7 +71,7 @@ const activeKey = computed(() => {
 })
 
 function handleMenu(key: string) { router.push(key) }
-function handleLogout() { clearAuth(); router.push('/login') }
+function handleLogout() { auth.logout(); router.push('/login') }
 </script>
 
 <style scoped>
