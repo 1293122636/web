@@ -33,7 +33,7 @@ Status: 45 API endpoints | 71 Java files | 31 Vue files | 8 XML mappers | 55 tes
 | 2026-06-29 | @Transactional over Prisma $transaction | Declarative transactions cleaner |
 | 2026-06-29 | Naive UI over Element Plus | Align with original version |
 | 2026-06-29 | Axios over fetch() | Course teaches Axios |
-| 2026-06-29 | CORS for 5173 + 5175 | Both versions coexist |
+| 2026-06-30 | CORS for 5175 (Java) + 5173 (original TS) | Migration coexistence (two frontends) |
 | 2026-06-30 | seed.sql over Java CommandLineRunner | Reproducible, no recompile needed |
 | 2026-06-30 | SQL from annotations to XML mappers | Readability + maintainability |
 | 2026-06-30 | Maven Wrapper (./mvnw) | Consistent builds across env |
@@ -50,7 +50,7 @@ Status: 45 API endpoints | 71 Java files | 31 Vue files | 8 XML mappers | 55 tes
 ./start.sh                       # build JAR + start -> :8080 (profile:dev)
 ./start.sh prod                  # start in production mode
 
-# Seed database
+# Seed database (prerequisite: CREATE DATABASE library; must exist first)
 mysql -h127.0.0.1 -uroot -p library < seed.sql
 
 # Frontend
@@ -228,6 +228,8 @@ Configuration split across profiles (`spring.profiles.active=dev` default):
 | application-dev.yml | Dev | `${DB_PASSWORD:li200603}` | `${JWT_SECRET:LibraryFullStack2024JWTSecretKeyForSpringBoot}` |
 | application-prod.yml | Prod | `${DB_PASSWORD}` | `${JWT_SECRET}` |
 
+> **JWT Secret**: The default secret in `application-dev.yml` is a dev-only placeholder. Production must use `${JWT_SECRET}` from environment variable — never hardcode secrets in committed config.
+
 ## 9. Error Handling
 
 | Condition | HTTP Status |
@@ -265,6 +267,16 @@ Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case)
 - Book delete: check copies+borrows before allowing
 - Concurrent borrow: must recheck availability inside `@Transactional` (not outside)
 
+**Hold/Borrow state machine:**
+```
+borrow() → available → borrowed
+returnBook() WITH pending hold → borrowed → on_hold (→ ready after admin fulfills)
+returnBook() WITHOUT hold → borrowed → available
+cancelHold(ready) → on_hold → available (item released)
+cancelHold(pending) → pending hold cancelled, no item state change
+fulfillHold(ready) → on_hold → borrowed (reader picks up the held item)
+```
+
 ### Frontend
 - UI: Naive UI (`n-data-table`, `n-button`, etc.)
 - Icons: `@vicons/ionicons5`
@@ -276,7 +288,8 @@ Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case)
 ### Tests
 - Service layer: `@ExtendWith(MockitoExtension.class)`, mock all mappers
 - Controller layer: `@SpringBootTest` + `@AutoConfigureMockMvc` + `@ActiveProfiles("test")`
-- Use H2 in-memory DB for controller tests (`application-test.yml`)
+  - Controllers use `@MockBean` for services — no real DB needed
+  - No `application-test.yml` exists yet; if integration tests (real DB) are added later, create `src/test/resources/application-test.yml` with H2 config
 - 55 total tests: 51 service + 4 controller
 
 ## 11. Database Tables (11 tables)
