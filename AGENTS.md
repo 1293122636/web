@@ -307,3 +307,4 @@ find frontend/src -name '*.vue' | wc -l
 # XML mappers
 find src -name '*.xml' -path '*/mappers/*' | wc -l
 ```
+注意：- **提交前跑测试。** `./mvnw test`（55 个测试全部通过再提交）可以拓展测试集，但要保证适用性。
