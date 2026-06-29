@@ -225,7 +225,7 @@ Configuration split across profiles (`spring.profiles.active=dev` default):
 | File | Scope | DB Password | JWT Secret |
 |------|-------|-------------|------------|
 | application.yml | All | — | — |
-| application-dev.yml | Dev | hardcoded | hardcoded |
+| application-dev.yml | Dev | `${DB_PASSWORD:li200603}` | `${JWT_SECRET:LibraryFullStack2024JWTSecretKeyForSpringBoot}` |
 | application-prod.yml | Prod | `${DB_PASSWORD}` | `${JWT_SECRET}` |
 
 ## 9. Error Handling

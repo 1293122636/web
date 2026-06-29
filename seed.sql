@@ -1,7 +1,7 @@
 -- ============================================================
 -- Library Full-Stack Seed — matching original Prisma seed data
 -- ============================================================
--- Run: mysql -h127.0.0.1 -uroot -pli200603 library < this_file
+-- Run: mysql -h127.0.0.1 -uroot -p library < this_file
 
 SET FOREIGN_KEY_CHECKS = 0;
 
