@@ -1,15 +1,15 @@
-# Library Full-Stack System — AGENTS.md
+# Library Full-Stack — AGENTS.md
 
-> AI agent instruction file. Matches original TypeScript version feature-by-feature.
+> AI agent instruction file for the Java (Spring Boot) version.
+> Must match the original TypeScript version (Fastify + Prisma + NaiveUI) feature-by-feature.
 > For human-readable introduction see README.md.
 
 ## 1. Project Overview
 
-图书馆全栈管理系统（Spring Boot 版）。前端与后端全部对齐原版 TypeScript 系统（Fastify + Prisma）。
-四层架构：前端(Vue3+NaiveUI) → Controller → Service → Mapper(MyBatis+MySQL)。Java 全栈，Maven monorepo（frontend/ + src/）。
+图书馆全栈管理系统（Spring Boot 3 版）。四层架构：Vue3+NaiveUI（`frontend/`）→ Controller → Service → Mapper(MyBatis+XML) → MySQL。
 
-**Origin**: https://github.com/Mrappleking/library-full-stack
-**Status**: 45 API endpoints | 71 Java files | 31 Vue files | 8 XML mappers | 55 tests | vite build ✅
+Origin: https://github.com/Mrappleking/library-full-stack
+Status: 45 API endpoints | 71 Java files | 31 Vue files | 8 XML mappers | 55 tests
 
 ## 2. Error Zone
 
@@ -20,16 +20,17 @@
 | 3 | SQL 嵌在 Java 注解字符串中 | 超 5 行的动态 SQL 不可读不可调 | 抽到 `src/main/resources/mappers/*.xml` |
 | 4 | `@Transactional` 缺失 | 并发 borrow 导致 available 变负数 | 所有多 DAO 写入操作加 `@Transactional` |
 | 5 | 注解 SQL 和 XML 同时定义同一 statement | `Mapped Statements collection already contains key` | 移除 Java 注解中的 `@Select`/`@Insert`/`@Update`/`@Delete` |
+| 6 | 数组 `transaction([])` 外部检查可用性 | 竞态条件下双借同一本 | `borrow()` 需在 `$transaction` 内重查可用性 |
 
 ## 3. Architecture Decisions
 
-先于所有规则。记录架构演变历史，不删旧记录。
+先于所有规则。只追加不删旧记录。决策后立即写入。
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-06-29 | MyBatis over JPA | Course teaches MyBatis |
 | 2026-06-29 | Custom JwtAuthFilter over Spring Security | Keep dependencies minimal |
-| 2026-06-29 | `@Transactional` over Prisma `$transaction` | Declarative transactions cleaner |
+| 2026-06-29 | @Transactional over Prisma $transaction | Declarative transactions cleaner |
 | 2026-06-29 | Naive UI over Element Plus | Align with original version |
 | 2026-06-29 | Axios over fetch() | Course teaches Axios |
 | 2026-06-29 | CORS for 5173 + 5175 | Both versions coexist |
@@ -46,7 +47,7 @@
 # Backend
 ./mvnw compile                   # compile (uses mvnw, no JAVA_HOME needed)
 ./mvnw test                      # run 55 tests (51 service + 4 controller)
-./start.sh                       # build JAR + start → :8080 (profile:dev)
+./start.sh                       # build JAR + start -> :8080 (profile:dev)
 ./start.sh prod                  # start in production mode
 
 # Seed database
@@ -55,7 +56,7 @@ mysql -h127.0.0.1 -uroot -p library < seed.sql
 # Frontend
 cd frontend
 npm install --registry=https://registry.npmmirror.com
-npm run dev                      # → :5175 (proxies /api → :8080)
+npm run dev                      # -> :5175 (proxies /api -> :8080)
 npm run build                    # production build to dist/
 
 # Kill
@@ -67,33 +68,34 @@ kill -9 $(lsof -ti:5175)
 
 ```
 src/                             # Spring Boot + MyBatis + MySQL
-└── main/java/com/library/
-    ├── LibraryApplication.java  # @SpringBootApplication
-    ├── config/       3 files   — JwtAuthFilter, WebConfig (CORS), JwtAuthInterceptor
-    ├── controller/   11 files  — 45 REST endpoints
-    ├── service/      9 files   — @Transactional business logic
-    ├── mapper/       11 files  — MyBatis @Mapper interfaces (SQL in XML)
-    ├── entity/       11 files  — POJO matching MySQL tables
-    ├── dto/request/  6 files   — @Valid request bodies
-    ├── dto/response/ 16 files  — Response DTOs
-    ├── exception/    2 files   — AppException + @RestControllerAdvice
-    └── util/         1 file    — JwtUtil
+main/java/com/library/
+  LibraryApplication.java        # @SpringBootApplication
+  config/    3 files             JwtAuthFilter, WebConfig (CORS), JwtAuthInterceptor
+  controller/ 11 files           45 REST endpoints
+  service/   9 files             @Transactional business logic
+  mapper/    11 files            MyBatis @Mapper interfaces (SQL in XML)
+  entity/    11 files            POJO matching MySQL tables
+  dto/request/  6 files          @Valid request bodies
+  dto/response/ 16 files         Response DTOs
+  exception/  2 files            AppException + @RestControllerAdvice
+  util/      1 file              JwtUtil
 
 frontend/                        # Vue 3 + Vite + Naive UI
-└── src/
-    ├── api/          index.ts, books.ts   — Axios + typed API
-    ├── stores/       auth.ts, books.ts   — Pinia
-    ├── router/       index.ts            — vue-router (matches original)
-    ├── types/        api.ts              — TypeScript interfaces
-    ├── composables/  index.ts            — usePagination, useDebounce
-    ├── components/   13 files            — All original components ported
-    ├── views/        17 files
-    └── App.vue
+  src/
+    api/      index.ts, books.ts  Axios + typed API
+    stores/   auth.ts, books.ts   Pinia
+    router/   index.ts            vue-router (matches original)
+    types/    api.ts              TypeScript interfaces
+    composables/  index.ts        usePagination, useDebounce
+    components/  13 files         All original components ported
+    views/       17 files
+    App.vue
 ```
 
 ## 6. API Route Table (45 endpoints)
 
 ### Auth (`/api/auth`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | /register | public | Reader register |
@@ -103,6 +105,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | POST | /admin/create | admin | Create admin |
 
 ### Books (`/api/books`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | public | List + search + filters + sort + pagination |
@@ -115,11 +118,13 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | POST | /:id/reconcile | admin | Fix available count |
 
 ### BookItems (`/api/book-items`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | /:barcode | auth | Barcode lookup + current borrow |
 
 ### Categories (`/api/categories`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | public | List with book count |
@@ -128,6 +133,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | DELETE | /:id | admin | Delete (refused if has books) |
 
 ### Borrows (`/api/borrows`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | /my | reader | My borrows |
@@ -138,6 +144,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | POST | /renew/:id | reader | Renew (once per borrow) |
 
 ### Holds (`/api/holds`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | POST | / | reader | Create hold |
@@ -148,6 +155,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | POST | /:id/fulfill | admin | Fulfill ready hold |
 
 ### Readers (`/api/readers`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | admin | Reader list |
@@ -156,6 +164,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | PUT | /profile | reader | Self-edit |
 
 ### Fines (`/api/fines`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | admin | All (filterable by type/paid) |
@@ -163,6 +172,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | POST | /:id/pay | admin | Mark paid |
 
 ### Rules (`/api/rules`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | public | Rule matrix |
@@ -171,6 +181,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | PUT | / | admin | Upsert rule |
 
 ### Stats (`/api/stats`)
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | / | admin | Overview (20,8,10,5,1) |
@@ -178,6 +189,7 @@ frontend/                        # Vue 3 + Vite + Naive UI
 | GET | /monthly | admin | Monthly (12 months) |
 
 ### System
+
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | GET | /api/health | public | `{ status: 'ok' }` |
@@ -185,25 +197,25 @@ frontend/                        # Vue 3 + Vite + Naive UI
 ## 7. Frontend Routing
 
 ```
-/                  → redirect to /books (public)
-/books             → BookGrid + FacetPanel + SearchBar (no auth)
-/books/:id         → BookDetailSection + HoldingsTable + borrow/hold
-/login             → LoginBg + dark glassmorphism + register modal
-/admin/*           → admin layout (role:admin)
-/admin/dashboard   → stat cards + quick actions + system info
-/admin/books       → CRUD table + expandable items + add copy
-/admin/borrows     → borrow table + return with overdue warning
-/admin/categories  → CRUD table
-/admin/circulation → barcode scan + borrow/return queue
-/admin/fines       → filterable table + pay action
-/admin/readers     → expandable reader list + edit modal
-/admin/settings    → rules/patron types/item types tables
-/admin/stats       → top 20 popular + monthly stats tables
-/reader/*          → reader layout (role:reader)
-/reader/books      → search + category filter + borrow
-/reader/my-borrows → fine alert + holds tab + renew
-/reader/profile    → editable form
-/:pathMatch(.*)*   → 404 redirect to /books
+/                  -> redirect to /books (public)
+/books             -> BookGrid + FacetPanel + SearchBar (no auth)
+/books/:id         -> BookDetailSection + HoldingsTable + borrow/hold
+/login             -> LoginBg + dark glassmorphism + register modal
+/admin/*           -> admin layout (role:admin)
+/admin/dashboard   -> stat cards + quick actions + system info
+/admin/books       -> CRUD table + expandable items + add copy
+/admin/borrows     -> borrow table + return with overdue warning
+/admin/categories  -> CRUD table
+/admin/circulation -> barcode scan + borrow/return queue
+/admin/fines       -> filterable table + pay action
+/admin/readers     -> expandable reader list + edit modal
+/admin/settings    -> rules/patron types/item types tables
+/admin/stats       -> top 20 popular + monthly stats tables
+/reader/*          -> reader layout (role:reader)
+/reader/books      -> search + category filter + borrow
+/reader/my-borrows -> fine alert + holds tab + renew
+/reader/profile    -> editable form
+/:pathMatch(.*)*   -> 404 redirect to /books
 ```
 
 ## 8. Environment
@@ -212,25 +224,14 @@ Configuration split across profiles (`spring.profiles.active=dev` default):
 
 | File | Scope | DB Password | JWT Secret |
 |------|-------|-------------|------------|
-| `application.yml` | All | — | — |
-| `application-dev.yml` | Dev | `li200603` (hardcoded) | hardcoded |
-| `application-prod.yml` | Prod | `${DB_PASSWORD}` | `${JWT_SECRET}` |
-
-```
-spring:
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://127.0.0.1:3306/library?serverTimezone=Asia/Shanghai
-app:
-  jwt:
-    secret: (dev: hardcoded, prod: env var)
-    expiration-ms: 86400000
-```
+| application.yml | All | — | — |
+| application-dev.yml | Dev | hardcoded | hardcoded |
+| application-prod.yml | Prod | `${DB_PASSWORD}` | `${JWT_SECRET}` |
 
 ## 9. Error Handling
 
-| Condition | Status |
-|-----------|--------|
+| Condition | HTTP Status |
+|-----------|-------------|
 | `@Valid` validation fails | 400 |
 | `AppException.notFound()` | 404 |
 | `AppException.conflict()` | 409 |
@@ -242,10 +243,10 @@ app:
 ## 10. Coding Conventions
 
 ### SQL (XML mappers only)
-- All MyBatis SQL goes in `src/main/resources/mappers/*.xml`, NOT in Java annotations
+- All MyBatis SQL in `src/main/resources/mappers/*.xml`, NOT in Java annotations
 - Use `<resultMap>` for `@Results` equivalent
 - Dynamic SQL uses `<if>`, `<choose>`, `<where>` tags
-- Column names in SQL must match actual DB column names (use `SHOW CREATE TABLE` to verify)
+- Column names in SQL must match actual DB column names (SHOW CREATE TABLE to verify)
 
 ### DB column naming hazard
 Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case). Always verify actual column names before writing SQL.
@@ -253,7 +254,7 @@ Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case)
 ### Java
 - Services: `@Service`, constructor injection, `@Transactional` for multi-DAO writes
 - Controllers: `@RestController`, thin dispatch, no Mapper calls
-- Mappers: interface only, SQL in XML via `namespace`
+- Mappers: interface only, SQL in XML via namespace
 - All POST/PUT use `@Valid` DTOs
 - Use `AppException` with descriptive messages
 
@@ -262,6 +263,7 @@ Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case)
 - `returnBook` when hold exists: item goes `borrowed -> on_hold`, available unchanged
 - Cancel hold when ready: release item to available, increment book count
 - Book delete: check copies+borrows before allowing
+- Concurrent borrow: must recheck availability inside `@Transactional` (not outside)
 
 ### Frontend
 - UI: Naive UI (`n-data-table`, `n-button`, etc.)
@@ -269,7 +271,7 @@ Database has mixed naming: `categoryId` (camelCase) vs `created_at` (snake_case)
 - API: Axios via `api/index.ts`
 - Auth: Pinia store + localStorage JWT
 - Routing: matches original exactly (public /books, /admin/*, /reader/*)
-- No emoji — use SVG icons
+- No emoji - use SVG icons
 
 ### Tests
 - Service layer: `@ExtendWith(MockitoExtension.class)`, mock all mappers
@@ -283,8 +285,25 @@ patron_categories, item_types, categories, circulation_rules, users, books, book
 
 Seed data via `seed.sql`: 3 patron types, 3 item types, 9 rules, 9 users, 20 books, 63 items, 23 borrows, 2 fines, 3 holds.
 
-## 12. Maven Wrapper
+## 12. Build & Startup
 
-`./mvnw` in project root. No global Maven install needed. JVM config in `pom.xml` (Java 21).
+`./mvnw` in project root. No global Maven install needed. Java 21.
 
-**Startup**: `./start.sh` builds JAR then runs `java -jar target/*.jar`. Avoid `mvn spring-boot:run` in production (OOM risk).
+Startup: `./start.sh` builds JAR then runs `java -jar target/*.jar`. Avoid `mvn spring-boot:run` (OOM risk).
+
+---
+
+## Data Verification (每次变更后运行)
+
+```bash
+# API endpoints
+grep -rn '@\(GetMapping\|PostMapping\|PutMapping\|DeleteMapping\)' src/main/java/com/library/controller/ | wc -l
+# Test count
+grep -rn '@Test' src/test/ --include='*.java' | wc -l
+# Java files
+find src/main -name '*.java' | wc -l
+# Vue files
+find frontend/src -name '*.vue' | wc -l
+# XML mappers
+find src -name '*.xml' -path '*/mappers/*' | wc -l
+```
