@@ -45,8 +45,10 @@ npm run dev
 - **列名陷阱。** 数据库列名混合 `categoryId`（camelCase）和 `created_at`（snake_case），写 SQL 前必须 `SHOW CREATE TABLE` 确认实际列名
 - **事务覆盖。** `borrow()` / `returnBook()` / `payFine()` 等多 DAO 写入必须加 `@Transactional`，缺少会因并发导致数据不一致
 - **启动方式。** 用 `./start.sh`，不要 `mvn spring-boot:run`（OOM 问题）
-- **种子数据。** 清库后记得跑 `mysql -h127.0.0.1 -uroot -p library < seed.sql`
-
+- **创建数据库（如果尚未创建）**
+mysql -h127.0.0.1 -uroot -p -e "CREATE DATABASE IF NOT EXISTS library;"
+- **导入种子数据**
+mysql -h127.0.0.1 -uroot -p library < seed.sql
 ### 前端
 
 - **镜像源。** 始终用 `npm install --registry=https://registry.npmmirror.com`
