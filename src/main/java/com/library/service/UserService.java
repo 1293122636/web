@@ -1,6 +1,5 @@
 package com.library.service;
 
-import com.library.dto.response.UserProfile;
 import com.library.entity.User;
 import com.library.exception.AppException;
 import com.library.mapper.UserMapper;

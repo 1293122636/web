@@ -1,9 +1,7 @@
 package com.library.controller;
 
 import com.library.dto.request.BookCreateRequest;
-import com.library.entity.Book;
 import com.library.service.BookService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
