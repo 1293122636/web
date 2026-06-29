@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.BookItemMapper">
+
+  <resultMap id="bookItemResult" type="com.library.entity.BookItem">
+    <id property="id" column="id"/>
+    <association property="itemType" column="itemTypeId" select="com.library.mapper.ItemTypeMapper.findById"/>
+  </resultMap>
+
+  <resultMap id="bookItemWithBook" type="com.library.entity.BookItem">
+    <id property="id" column="id"/>
+    <association property="book" column="bookId" select="com.library.mapper.BookMapper.findById"/>
+    <association property="itemType" column="itemTypeId" select="com.library.mapper.ItemTypeMapper.findById"/>
+  </resultMap>
+
+  <select id="findById" resultMap="bookItemResult">
+    SELECT * FROM book_items WHERE id = #{id}
+  </select>
+
+  <select id="findByBarcode" resultMap="bookItemWithBook">
+    SELECT * FROM book_items WHERE barcode = #{barcode}
+  </select>
+
+  <select id="findByBookId" resultMap="bookItemResult">
+    SELECT * FROM book_items WHERE bookId = #{bookId} ORDER BY barcode ASC
+  </select>
+
+  <select id="findFirstAvailableByBookId" resultType="com.library.entity.BookItem">
+    SELECT * FROM book_items WHERE bookId = #{bookId} AND status = 'available' LIMIT 1
+  </select>
+
+  <select id="findAvailableByBookId" resultType="com.library.entity.BookItem">
+    SELECT * FROM book_items WHERE bookId = #{bookId} AND status = 'available'
+  </select>
+
+  <select id="countAvailableByBookId" resultType="long">
+    SELECT COUNT(*) FROM book_items WHERE bookId = #{bookId} AND status = 'available'
+  </select>
+
+  <select id="countByBookId" resultType="long">
+    SELECT COUNT(*) FROM book_items WHERE bookId = #{bookId}
+  </select>
+
+  <select id="findCampuses" resultType="string">
+    SELECT DISTINCT campus FROM book_items WHERE campus IS NOT NULL ORDER BY campus
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO book_items(barcode, callNumber, location, `condition`, status, price, acquired_at, notes, campus, requests, bookId, itemTypeId, created_at, updated_at)
+    VALUES(#{barcode}, #{callNumber}, #{location}, #{condition}, #{status}, #{price}, #{acquiredAt}, #{notes}, #{campus}, #{requests}, #{bookId}, #{itemTypeId}, NOW(), NOW())
+  </insert>
+
+  <update id="updateStatus">
+    UPDATE book_items SET status=#{status}, updated_at=NOW() WHERE id=#{id}
+  </update>
+
+  <update id="incrementRequests">
+    UPDATE book_items SET requests = requests + 1 WHERE id=#{id}
+  </update>
+
+</mapper>

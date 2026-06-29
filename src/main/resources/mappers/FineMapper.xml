@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.FineMapper">
+
+  <resultMap id="fullFine" type="com.library.entity.Fine">
+    <id property="id" column="id"/>
+    <association property="user" column="userId" select="com.library.mapper.UserMapper.findById"/>
+    <association property="borrowRecord" column="borrowRecordId" select="com.library.mapper.BorrowRecordMapper.findById"/>
+  </resultMap>
+
+  <select id="findById" resultMap="fullFine">
+    SELECT * FROM fines WHERE id = #{id}
+  </select>
+
+  <select id="findAll" resultMap="fullFine">
+    SELECT * FROM fines WHERE 1=1
+    <if test="type != null">AND type = #{type}</if>
+    <if test="paid != null">AND paid = #{paid}</if>
+    ORDER BY created_at DESC
+  </select>
+
+  <select id="findByUserId" resultMap="fullFine">
+    SELECT * FROM fines WHERE userId = #{userId} ORDER BY created_at DESC
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO fines(amount, paid, paid_at, borrowRecordId, userId, type, created_at)
+    VALUES(#{amount}, false, NULL, #{borrowRecordId}, #{userId}, #{type}, NOW())
+  </insert>
+
+  <update id="markPaid">
+    UPDATE fines SET paid=true, paid_at=#{paidAt} WHERE id=#{id}
+  </update>
+
+</mapper>

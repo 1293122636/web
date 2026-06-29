@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.HoldMapper">
+
+  <resultMap id="fullHold" type="com.library.entity.Hold">
+    <id property="id" column="id"/>
+    <association property="book" column="bookId" select="com.library.mapper.BookMapper.findById"/>
+    <association property="user" column="userId" select="com.library.mapper.UserMapper.findById"/>
+    <association property="bookItem" column="bookItemId" select="com.library.mapper.BookItemMapper.findById"/>
+  </resultMap>
+
+  <resultMap id="holdWithBook" type="com.library.entity.Hold">
+    <id property="id" column="id"/>
+    <association property="book" column="bookId" select="com.library.mapper.BookMapper.findById"/>
+  </resultMap>
+
+  <select id="findById" resultMap="fullHold">
+    SELECT * FROM holds WHERE id = #{id}
+  </select>
+
+  <select id="findByUserId" resultMap="holdWithBook">
+    SELECT * FROM holds WHERE userId = #{userId} ORDER BY request_date DESC
+  </select>
+
+  <select id="findAll" resultMap="fullHold">
+    SELECT * FROM holds WHERE 1=1
+    <if test="status != null">AND status = #{status}</if>
+    <if test="bookId != null">AND bookId = #{bookId}</if>
+    ORDER BY request_date DESC
+  </select>
+
+  <select id="findNextPendingByBookId" resultMap="holdWithBook">
+    SELECT * FROM holds WHERE bookId = #{bookId} AND status = 'pending' ORDER BY request_date ASC LIMIT 1
+  </select>
+
+  <select id="findExistingHold" resultType="com.library.entity.Hold">
+    SELECT * FROM holds WHERE userId = #{userId} AND bookId = #{bookId} AND status IN ('pending', 'ready') LIMIT 1
+  </select>
+
+  <select id="countActiveByUserId" resultType="long">
+    SELECT COUNT(*) FROM holds WHERE userId = #{userId} AND status IN ('pending', 'ready')
+  </select>
+
+  <select id="countPendingByBookId" resultType="long">
+    SELECT COUNT(*) FROM holds WHERE bookId = #{bookId} AND status = 'pending'
+  </select>
+
+  <select id="findExpiredReadyHolds" resultType="com.library.entity.Hold">
+    SELECT * FROM holds WHERE status = 'ready' AND expiry_date IS NOT NULL AND expiry_date &lt; NOW()
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO holds(userId, bookId, status, request_date, created_at) VALUES(#{userId}, #{bookId}, 'pending', NOW(), NOW())
+  </insert>
+
+  <update id="updateToReady">
+    UPDATE holds SET status=#{status}, bookItemId=#{bookItemId}, expiry_date=#{expiryDate} WHERE id=#{id}
+  </update>
+
+  <update id="fulfill">
+    UPDATE holds SET status=#{status}, fulfilled_at=NOW() WHERE id=#{id}
+  </update>
+
+  <update id="updateStatus">
+    UPDATE holds SET status=#{status} WHERE id=#{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM holds WHERE id=#{id}
+  </delete>
+
+</mapper>

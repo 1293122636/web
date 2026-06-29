@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.BookMapper">
+
+  <resultMap id="bookResult" type="com.library.entity.Book">
+    <id property="id" column="id"/>
+    <result property="categoryId" column="categoryId"/>
+    <association property="category" column="categoryId" select="com.library.mapper.CategoryMapper.findById"/>
+  </resultMap>
+
+  <select id="findById" resultMap="bookResult">
+    SELECT b.*, c.name as category_name, c.`desc` as category_desc
+    FROM books b LEFT JOIN categories c ON b.categoryId = c.id
+    WHERE b.id = #{id}
+  </select>
+
+  <select id="findByIsbn" resultType="com.library.entity.Book">
+    SELECT * FROM books WHERE isbn = #{isbn}
+  </select>
+
+  <select id="searchBooks" resultMap="bookResult">
+    SELECT b.* FROM books b LEFT JOIN categories c ON b.categoryId = c.id
+    WHERE 1=1
+    <if test="search != null">AND (b.title LIKE CONCAT('%', #{search}, '%') OR b.author LIKE CONCAT('%', #{search}, '%') OR b.isbn LIKE CONCAT('%', #{search}, '%'))</if>
+    <if test="categoryId != null">AND b.categoryId = #{categoryId}</if>
+    <if test="yearMin != null">AND b.year &gt;= #{yearMin}</if>
+    <if test="yearMax != null">AND b.year &lt;= #{yearMax}</if>
+    <if test="language != null">AND b.language = #{language}</if>
+    <if test="campus != null">AND b.id IN (SELECT bookId FROM book_items WHERE campus = #{campus})</if>
+    ORDER BY
+    <choose>
+      <when test="sortBy == 'year'">b.year DESC</when>
+      <when test="sortBy == 'title'">b.title ASC</when>
+      <otherwise>b.created_at DESC</otherwise>
+    </choose>
+  </select>
+
+  <select id="countBooks" resultType="long">
+    SELECT COUNT(*) FROM books b LEFT JOIN categories c ON b.categoryId = c.id
+    WHERE 1=1
+    <if test="search != null">AND (b.title LIKE CONCAT('%', #{search}, '%') OR b.author LIKE CONCAT('%', #{search}, '%') OR b.isbn LIKE CONCAT('%', #{search}, '%'))</if>
+    <if test="categoryId != null">AND b.categoryId = #{categoryId}</if>
+    <if test="yearMin != null">AND b.year &gt;= #{yearMin}</if>
+    <if test="yearMax != null">AND b.year &lt;= #{yearMax}</if>
+    <if test="language != null">AND b.language = #{language}</if>
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO books(isbn, title, author, publisher, year, total, available, status, location, cover, `desc`, clcNumber, physicalDesc, language, country, categoryId, created_at, updated_at)
+    VALUES(#{isbn}, #{title}, #{author}, #{publisher}, #{year}, #{total}, #{available}, #{status}, #{location}, #{cover}, #{desc}, #{clcNumber}, #{physicalDesc}, #{language}, #{country}, #{categoryId}, NOW(), NOW())
+  </insert>
+
+  <update id="update">
+    UPDATE books SET updated_at=NOW()
+    <if test="isbn != null">, isbn=#{isbn}</if>
+    <if test="title != null">, title=#{title}</if>
+    <if test="author != null">, author=#{author}</if>
+    <if test="publisher != null">, publisher=#{publisher}</if>
+    <if test="year != null">, year=#{year}</if>
+    <if test="total != null">, total=#{total}</if>
+    <if test="location != null">, location=#{location}</if>
+    <if test="cover != null">, cover=#{cover}</if>
+    <if test="desc != null">, `desc`=#{desc}</if>
+    <if test="clcNumber != null">, clcNumber=#{clcNumber}</if>
+    <if test="physicalDesc != null">, physicalDesc=#{physicalDesc}</if>
+    <if test="language != null">, language=#{language}</if>
+    <if test="country != null">, country=#{country}</if>
+    <if test="categoryId != null">, categoryId=#{categoryId}</if>
+    WHERE id=#{id}
+  </update>
+
+  <update id="updateTotalAndAvailable">
+    UPDATE books SET total=#{total}, available=#{available} WHERE id=#{id}
+  </update>
+
+  <update id="decrementAvailable">
+    UPDATE books SET available = available - 1 WHERE id=#{id} AND available > 0
+  </update>
+
+  <update id="incrementAvailable">
+    UPDATE books SET available = available + 1 WHERE id=#{id}
+  </update>
+
+  <update id="updateStatus">
+    UPDATE books SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM books WHERE id=#{id}
+  </delete>
+
+  <select id="count" resultType="long">
+    SELECT COUNT(*) FROM books
+  </select>
+
+  <select id="findAll" resultType="com.library.entity.Book">
+    SELECT * FROM books ORDER BY created_at DESC
+  </select>
+
+  <select id="findLanguages" resultType="string">
+    SELECT DISTINCT language FROM books WHERE language IS NOT NULL ORDER BY language
+  </select>
+
+  <select id="findYears" resultType="int">
+    SELECT DISTINCT year FROM books WHERE year IS NOT NULL ORDER BY year
+  </select>
+
+</mapper>

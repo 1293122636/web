@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/dtd Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.UserMapper">
+
+  <select id="findById" resultType="com.library.entity.User">
+    SELECT * FROM users WHERE id = #{id}
+  </select>
+
+  <select id="findByUsername" resultType="com.library.entity.User">
+    SELECT * FROM users WHERE username = #{username}
+  </select>
+
+  <select id="findAll" resultType="com.library.entity.User">
+    SELECT * FROM users ORDER BY created_at DESC
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO users(username, password, name, role, phone, email, totalFines, patronCategoryId, created_at, updated_at)
+    VALUES(#{username}, #{password}, #{name}, #{role}, #{phone}, #{email}, 0, #{patronCategoryId}, NOW(), NOW())
+  </insert>
+
+  <update id="update">
+    UPDATE users SET name=#{name}, phone=#{phone}, email=#{email}, updated_at=NOW() WHERE id=#{id}
+  </update>
+
+  <update id="addFine">
+    UPDATE users SET totalFines = totalFines + #{amount} WHERE id=#{userId}
+  </update>
+
+  <select id="findPage" resultType="com.library.entity.User">
+    SELECT * FROM users ORDER BY created_at DESC LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="countReaders" resultType="long">
+    SELECT COUNT(*) FROM users WHERE role = 'reader'
+  </select>
+
+  <select id="count" resultType="long">
+    SELECT COUNT(*) FROM users
+  </select>
+
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.CirculationRuleMapper">
+
+  <resultMap id="ruleResult" type="com.library.entity.CirculationRule">
+    <id property="id" column="id"/>
+    <association property="patronCategory" column="patronCategoryId" select="com.library.mapper.PatronCategoryMapper.findById"/>
+    <association property="itemType" column="itemTypeId" select="com.library.mapper.ItemTypeMapper.findById"/>
+  </resultMap>
+
+  <select id="findById" resultMap="ruleResult">
+    SELECT * FROM circulation_rules WHERE id = #{id}
+  </select>
+
+  <select id="findAll" resultMap="ruleResult">
+    SELECT * FROM circulation_rules ORDER BY patronCategoryId, itemTypeId
+  </select>
+
+  <select id="findByPatronAndItemType" resultType="com.library.entity.CirculationRule">
+    SELECT * FROM circulation_rules WHERE patronCategoryId = #{patronCategoryId} AND itemTypeId = #{itemTypeId} LIMIT 1
+  </select>
+
+  <select id="findDefault" resultType="com.library.entity.CirculationRule">
+    SELECT * FROM circulation_rules WHERE patronCategoryId IS NULL AND itemTypeId IS NULL LIMIT 1
+  </select>
+
+  <insert id="upsert">
+    INSERT INTO circulation_rules(patronCategoryId, itemTypeId, maxBorrows, loanDays, renewals, renewalDays, finePerDay, created_at)
+    VALUES(#{patronCategoryId}, #{itemTypeId}, #{maxBorrows}, #{loanDays}, #{renewals}, #{renewalDays}, #{finePerDay}, NOW())
+    ON DUPLICATE KEY UPDATE maxBorrows=#{maxBorrows}, loanDays=#{loanDays}, renewals=#{renewals}, renewalDays=#{renewalDays}, finePerDay=#{finePerDay}
+  </insert>
+
+</mapper>
