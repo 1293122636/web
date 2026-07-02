@@ -70,30 +70,30 @@ INSERT INTO categories (id, name, `desc`, created_at, updated_at) VALUES
 -- ===== 6. Books (20种) =====
 INSERT INTO books (id, isbn, title, author, publisher, year, total, available, status, clcNumber, physicalDesc, language, country, categoryId, `desc`, cover, created_at, updated_at) VALUES
 -- 计算机科学 (cat=1)
-(1,  '978-7-111-58444-5', '算法导论',             'Thomas H. Cormen',  '机械工业出版社',   2013, 5, 0, 'available', 'TP301.6',  '780页', 'chi', 'CN', 1, '算法导论 — Thomas H. Cormen 著', 'https://img.alicdn.com/bao/uploaded/i1/2744812128/O1CN01qKXgUG1RafRgDyVOu_!!0-item_pic.jpg', NOW(), NOW()),
-(2,  '978-7-111-52944-6', '深入理解计算机系统',     'Randal E. Bryant',  '机械工业出版社',   2016, 3, 3, 'available', 'TP303',    '737页', 'chi', 'CN', 1, '深入理解计算机系统 — Randal E. Bryant 著', 'https://www0.kfzimg.com/sw/kfz-cos/kfzimg/acbebccc/d7af732c46f585a3_s.jpg', NOW(), NOW()),
-(3,  '978-7-302-57486-0', '机器学习',              '周志华',            '清华大学出版社',   2016, 3, 2, 'available', 'TP181',    '425页', 'chi', 'CN', 1, '机器学习 — 周志华 著', 'https://img11.360buyimg.com/n1/jfs/t1/54802/36/8844/217804/5d6388dbE4a088e81/05d1646fcc28420b.jpg', NOW(), NOW()),
-(4,  '978-7-121-41559-1', 'Python深度学习',        'François Chollet',  '电子工业出版社',   2022, 3, 3, 'available', 'TP311.56', '481页', 'chi', 'CN', 1, 'Python深度学习 — François Chollet 著', 'https://www0.kfzimg.com/sw/kfz-cos/kfzimg/cddafecc/bffd05aa3fa8925e_n.jpg', NOW(), NOW()),
-(5,  '978-7-115-60960-1', '计算机网络：自顶向下',   'James Kurose',      '人民邮电出版社',   2022, 3, 2, 'available', 'TP393',    '684页', 'chi', 'CN', 1, '计算机网络：自顶向下 — James Kurose 著', 'https://img.alicdn.com/i1/3446196188/O1CN01jZVOSy1va9YsZXryG_!!3446196188.jpg', NOW(), NOW()),
-(6,  '0-201-61586-X',     'Computer Networks',     'Andrew Tanenbaum',  'Prentice Hall',    2017, 3, 3, 'available', 'TP393',    '960pp', 'eng', 'US', 1, 'Computer Networks — Andrew Tanenbaum 著', 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1347462821i/166190.jpg', NOW(), NOW()),
+(1,  '978-7-111-58444-5', '算法导论',             'Thomas H. Cormen',  '机械工业出版社',   2013, 5, 0, 'available', 'TP301.6',  '780页', 'chi', 'CN', 1, '算法导论 — Thomas H. Cormen 著', '/covers/1-算法导论.jpg', NOW(), NOW()),
+(2,  '978-7-111-52944-6', '深入理解计算机系统',     'Randal E. Bryant',  '机械工业出版社',   2016, 3, 3, 'available', 'TP303',    '737页', 'chi', 'CN', 1, '深入理解计算机系统 — Randal E. Bryant 著', '/covers/2-深入理解计算机系统.jpg', NOW(), NOW()),
+(3,  '978-7-302-57486-0', '机器学习',              '周志华',            '清华大学出版社',   2016, 3, 2, 'available', 'TP181',    '425页', 'chi', 'CN', 1, '机器学习 — 周志华 著', '/covers/3-机器学习.jpg', NOW(), NOW()),
+(4,  '978-7-121-41559-1', 'Python深度学习',        'François Chollet',  '电子工业出版社',   2022, 3, 3, 'available', 'TP311.56', '481页', 'chi', 'CN', 1, 'Python深度学习 — François Chollet 著', '/covers/4-Python深度学习.jpg', NOW(), NOW()),
+(5,  '978-7-115-60960-1', '计算机网络：自顶向下',   'James Kurose',      '人民邮电出版社',   2022, 3, 2, 'available', 'TP393',    '684页', 'chi', 'CN', 1, '计算机网络：自顶向下 — James Kurose 著', '/covers/5-计算机网络.jpg', NOW(), NOW()),
+(6,  '0-201-61586-X',     'Computer Networks',     'Andrew Tanenbaum',  'Prentice Hall',    2017, 3, 3, 'available', 'TP393',    '960pp', 'eng', 'US', 1, 'Computer Networks — Andrew Tanenbaum 著', '/covers/6-Computer Networks.jpg', NOW(), NOW()),
 -- 文学小说 (cat=2)
-(7,  '978-7-02-000220-7', '红楼梦',                '曹雪芹',            '人民文学出版社',   1996, 4, 3, 'available', 'I242.4',   '1606页','chi', 'CN', 2, '红楼梦 — 曹雪芹 著', 'https://booklibimg.kfzimg.com/data/book_lib_img_v2/user/1/ebcd/ebcd90378f6f38976296a22929a1e2e9_0_1_300_300.jpg', NOW(), NOW()),
-(8,  '978-7-5447-4254-2', '百年孤独',              '加西亚·马尔克斯',    '南海出版公司',     2011, 3, 3, 'available', 'I775.45',  '360页', 'chi', 'CN', 2, '百年孤独 — 加西亚·马尔克斯 著', 'https://img.alicdn.com/bao/uploaded/i1/1086465456/TB1EN7iOXXXXXc0apXXXXXXXXXX_!!0-item_pic.jpg', NOW(), NOW()),
-(9,  '978-7-5063-5020-8', '平凡的世界',            '路遥',              '作家出版社',       2012, 3, 3, 'available', 'I247.5',   '1296页','chi', 'CN', 2, '平凡的世界 — 路遥 著', 'https://img.alicdn.com/bao/uploaded/i3/720096711/O1CN01f4KpcD1zRggmBcsgz_!!2-item_pic.png', NOW(), NOW()),
-(10, '978-7-5404-7062-5', '活着',                  '余华',              '湖南文艺出版社',   2017, 3, 3, 'available', 'I247.57',  '191页', 'chi', 'CN', 2, '活着 — 余华 著', 'https://img14.360buyimg.com/pop/jfs/t1/202390/35/17788/414539/61b1d057E5f58c1db/ed08fade1834dffd.png', NOW(), NOW()),
+(7,  '978-7-02-000220-7', '红楼梦',                '曹雪芹',            '人民文学出版社',   1996, 4, 3, 'available', 'I242.4',   '1606页','chi', 'CN', 2, '红楼梦 — 曹雪芹 著', '/covers/7-红楼梦.jpg', NOW(), NOW()),
+(8,  '978-7-5447-4254-2', '百年孤独',              '加西亚·马尔克斯',    '南海出版公司',     2011, 3, 3, 'available', 'I775.45',  '360页', 'chi', 'CN', 2, '百年孤独 — 加西亚·马尔克斯 著', '/covers/8-百年孤独.jpg', NOW(), NOW()),
+(9,  '978-7-5063-5020-8', '平凡的世界',            '路遥',              '作家出版社',       2012, 3, 3, 'available', 'I247.5',   '1296页','chi', 'CN', 2, '平凡的世界 — 路遥 著', '/covers/9-平凡的世界.png', NOW(), NOW()),
+(10, '978-7-5404-7062-5', '活着',                  '余华',              '湖南文艺出版社',   2017, 3, 3, 'available', 'I247.57',  '191页', 'chi', 'CN', 2, '活着 — 余华 著', '/covers/10-活着.png', NOW(), NOW()),
 -- 自然科学 (cat=3)
-(11, '978-7-301-27701-2', '时间简史',              '史蒂芬·霍金',       '北京大学出版社',   1998, 3, 2, 'available', 'P159-49',  '212页', 'chi', 'CN', 3, '时间简史 — 史蒂芬·霍金 著', 'https://img10.360buyimg.com/n1/s720x720_jfs/t1/373056/11/3089/98455/69328cd2F4fec62f5/55790ff891400619.jpg', NOW(), NOW()),
-(12, '978-7-5536-4786-9', '上帝掷骰子吗',          '曹天元',            '浙江教育出版社',   2018, 3, 3, 'available', 'O413-49',  '420页', 'chi', 'CN', 3, '上帝掷骰子吗 — 曹天元 著', 'https://img12.360buyimg.com/n1/jfs/t331/144/2049514225/87843/aae4d47c/544e0afaN656f5eda.jpg', NOW(), NOW()),
-(13, '978-7-302-57834-0', '从一到无穷大',          '乔治·伽莫夫',       '清华大学出版社',   2020, 3, 3, 'available', 'N49',      '328页', 'chi', 'CN', 3, '从一到无穷大 — 乔治·伽莫夫 著', 'https://img13.360buyimg.com/n1/jfs/t1/85354/1/17985/213624/5e8ef59bE379d1b17/01eb5584381ac943.jpg', NOW(), NOW()),
+(11, '978-7-301-27701-2', '时间简史',              '史蒂芬·霍金',       '北京大学出版社',   1998, 3, 2, 'available', 'P159-49',  '212页', 'chi', 'CN', 3, '时间简史 — 史蒂芬·霍金 著', '/covers/11-时间简史.jpg', NOW(), NOW()),
+(12, '978-7-5536-4786-9', '上帝掷骰子吗',          '曹天元',            '浙江教育出版社',   2018, 3, 3, 'available', 'O413-49',  '420页', 'chi', 'CN', 3, '上帝掷骰子吗 — 曹天元 著', '/covers/12-上帝掷骰子吗.jpg', NOW(), NOW()),
+(13, '978-7-302-57834-0', '从一到无穷大',          '乔治·伽莫夫',       '清华大学出版社',   2020, 3, 3, 'available', 'N49',      '328页', 'chi', 'CN', 3, '从一到无穷大 — 乔治·伽莫夫 著', '/covers/13-从一到无穷大.jpg', NOW(), NOW()),
 -- 历史哲学 (cat=4)
-(14, '978-7-108-04436-5', '万历十五年',            '黄仁宇',            '生活·读书·新知三联书店', 1997, 3, 3, 'available', 'K248.307', '386页', 'chi', 'CN', 4, '万历十五年 — 黄仁宇 著', 'https://img11.360buyimg.com/n1/jfs/t1/153654/33/7399/210089/5fbf8b7eE5ba7f627/e52923825b6c1d7a.png', NOW(), NOW()),
-(15, '978-7-220-10795-7', '人类简史',              '尤瓦尔·赫拉利',     '四川人民出版社',   2021, 3, 2, 'available', 'K02-49',   '440页', 'chi', 'CN', 4, '人类简史 — 尤瓦尔·赫拉利 著', 'https://img.alicdn.com/i2/101450072/O1CN0112Kj9F1CP1GuGqRvS-101450072.png', NOW(), NOW()),
-(16, '978-7-108-06904-7', '中国哲学简史',          '冯友兰',            '生活·读书·新知三联书店', 2019, 3, 3, 'available', 'B2',       '416页', 'chi', 'CN', 4, '中国哲学简史 — 冯友兰 著', 'https://www0.kfzimg.com/sw/kfz-cos/kfzimg/11524160/590ae5a3a054dafb_n.jpg', NOW(), NOW()),
+(14, '978-7-108-04436-5', '万历十五年',            '黄仁宇',            '生活·读书·新知三联书店', 1997, 3, 3, 'available', 'K248.307', '386页', 'chi', 'CN', 4, '万历十五年 — 黄仁宇 著', '/covers/14-万历十五年.png', NOW(), NOW()),
+(15, '978-7-220-10795-7', '人类简史',              '尤瓦尔·赫拉利',     '四川人民出版社',   2021, 3, 2, 'available', 'K02-49',   '440页', 'chi', 'CN', 4, '人类简史 — 尤瓦尔·赫拉利 著', '/covers/15-人类简史.png', NOW(), NOW()),
+(16, '978-7-108-06904-7', '中国哲学简史',          '冯友兰',            '生活·读书·新知三联书店', 2019, 3, 3, 'available', 'B2',       '416页', 'chi', 'CN', 4, '中国哲学简史 — 冯友兰 著', '/covers/16-中国哲学简史.jpg', NOW(), NOW()),
 -- 经济管理 (cat=5)
-(17, '978-7-5086-5191-5', '从0到1',                '彼得·蒂尔',         '中信出版社',       2015, 3, 3, 'available', 'F272',     '260页', 'chi', 'CN', 5, '从0到1 — 彼得·蒂尔 著', 'https://img.alicdn.com/i1/859515618/O1CN016UtoEJ1rN5iXO1vAb_!!859515618.jpg', NOW(), NOW()),
-(18, '978-7-5086-6081-8', '思考，快与慢',          '丹尼尔·卡尼曼',     '中信出版社',       2020, 3, 2, 'available', 'F069.9',   '484页', 'chi', 'CN', 5, '思考，快与慢 — 丹尼尔·卡尼曼 著', 'https://img.alicdn.com/bao/uploaded/O1CN01Dopa1C1S86SvbY3qZ_!!6000000002201-0-yinhe.jpg', NOW(), NOW()),
-(19, '978-7-5049-9117-9', '国富论',                '亚当·斯密',         '中国人民大学出版社',2021, 3, 3, 'available', 'F091.33',  '540页', 'chi', 'CN', 5, '国富论 — 亚当·斯密 著', 'https://booklibimg.kfzimg.com/data/book_lib_img_v2/isbn/1/2650/26501c0b622acf0590a29b60b918ac7c_0_1_300_300.jpg', NOW(), NOW()),
-(20, '978-4-00-331041-5', 'PHP是世界上最好的语言',  '佚名',              '技术出版社',       2024, 3, 3, 'available', 'TP312',    '200页', 'jpn', 'JP', 1, 'PHP是世界上最好的语言 — 佚名 著', 'https://www.21cto.com/uploads/article/20170509/2bf93f173a3490a4a9a004016362691d.png', NOW(), NOW());
+(17, '978-7-5086-5191-5', '从0到1',                '彼得·蒂尔',         '中信出版社',       2015, 3, 3, 'available', 'F272',     '260页', 'chi', 'CN', 5, '从0到1 — 彼得·蒂尔 著', '/covers/17-从0到1.jpg', NOW(), NOW()),
+(18, '978-7-5086-6081-8', '思考，快与慢',          '丹尼尔·卡尼曼',     '中信出版社',       2020, 3, 2, 'available', 'F069.9',   '484页', 'chi', 'CN', 5, '思考，快与慢 — 丹尼尔·卡尼曼 著', '/covers/18-思考快与慢.jpg', NOW(), NOW()),
+(19, '978-7-5049-9117-9', '国富论',                '亚当·斯密',         '中国人民大学出版社',2021, 3, 3, 'available', 'F091.33',  '540页', 'chi', 'CN', 5, '国富论 — 亚当·斯密 著', '/covers/19-国富论.jpg', NOW(), NOW()),
+(20, '978-4-00-331041-5', 'PHP是世界上最好的语言',  '佚名',              '技术出版社',       2024, 3, 3, 'available', 'TP312',    '200页', 'jpn', 'JP', 1, 'PHP是世界上最好的语言 — 佚名 著', '/covers/20-PHP是世界上最好的语言.png', NOW(), NOW());
 
 -- ===== 7. Book Items (copies) =====
 -- 算法导论: 5 copies (id=1)
