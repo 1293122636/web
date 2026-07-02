@@ -23,7 +23,4 @@ public interface BookMapper {
     List<Book> findAll();
     List<String> findLanguages();
     List<Integer> findYears();
-    List<Map<String, Object>> countByLanguage(Map<String, Object> params);
-    List<Map<String, Object>> countByCategory(Map<String, Object> params);
-    List<Map<String, Object>> countByYearDecade(Map<String, Object> params);
 }

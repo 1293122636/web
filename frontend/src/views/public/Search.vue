@@ -81,7 +81,11 @@ onMounted(async () => {
 
 async function onSearch(query: string) {
   searchInput.value = query
-  await store.search({ search: query || undefined })
+  // Merge current activeFilters to preserve campus/category filters
+  const params: BookListParams = { ...activeFilters.value }
+  if (query) params.search = query
+  else delete params.search
+  await store.search(params)
   await store.updateFacets({ search: query || undefined })
 }
 

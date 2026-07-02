@@ -13,4 +13,7 @@ public interface FineMapper {
     List<Fine> findByUserId(Integer userId);
     void insert(Fine fine);
     void markPaid(@Param("id") Integer id, @Param("paidAt") LocalDateTime paidAt);
+
+    // For overdue fine scheduler idempotency check
+    Integer findByBorrowRecordId(@Param("borrowRecordId") Integer borrowRecordId);
 }

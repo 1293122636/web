@@ -6,6 +6,7 @@ import com.library.entity.User;
 import com.library.exception.AppException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,7 +25,7 @@ class AuthServiceTest extends AbstractServiceTest {
     @BeforeEach
     void setUp() {
         passwordEncoder = new BCryptPasswordEncoder();
-        authService = new AuthService(userMapper, passwordEncoder, jwtUtil);
+        authService = new AuthService(userMapper, passwordEncoder, jwtUtil, auditLogMapper);
     }
 
     @Test
@@ -35,7 +36,6 @@ class AuthServiceTest extends AbstractServiceTest {
         req.setPassword("pass123");
         req.setName("Test User");
 
-        when(userMapper.findByUsername("testuser")).thenReturn(null);
         when(jwtUtil.generateToken(anyInt(), eq("reader"))).thenReturn("test-token");
 
         User savedUser = new User();
@@ -62,8 +62,8 @@ class AuthServiceTest extends AbstractServiceTest {
         assertEquals("Test User", response.getUser().getName());
         assertEquals("reader", response.getUser().getRole());
 
-        verify(userMapper).findByUsername("testuser");
         verify(userMapper).insert(any(User.class));
+        verifyNoMoreInteractions(userMapper);
     }
 
     @Test
@@ -73,9 +73,11 @@ class AuthServiceTest extends AbstractServiceTest {
         req.setPassword("pass123");
         req.setName("Existing User");
 
-        when(userMapper.findByUsername("existing")).thenReturn(new User());
+        doThrow(new DataIntegrityViolationException("Duplicate entry"))
+                .when(userMapper).insert(any(User.class));
 
-        assertThrows(AppException.class, () -> authService.register(req));
+        AppException ex = assertThrows(AppException.class, () -> authService.register(req));
+        assertEquals("用户名已存在", ex.getMessage());
     }
 
     @Test

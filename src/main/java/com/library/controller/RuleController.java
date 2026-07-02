@@ -1,11 +1,13 @@
 package com.library.controller;
 
+import com.library.dto.request.RuleUpsertRequest;
 import com.library.entity.PatronCategory;
 import com.library.entity.ItemType;
 import com.library.entity.CirculationRule;
 import com.library.mapper.PatronCategoryMapper;
 import com.library.mapper.ItemTypeMapper;
 import com.library.mapper.CirculationRuleMapper;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +45,15 @@ public class RuleController {
     }
 
     @PutMapping
-    public ResponseEntity<?> upsert(@RequestBody CirculationRule rule) {
+    public ResponseEntity<CirculationRule> upsert(@Valid @RequestBody RuleUpsertRequest request) {
+        CirculationRule rule = new CirculationRule();
+        rule.setPatronCategoryId(request.getPatronCategoryId());
+        rule.setItemTypeId(request.getItemTypeId());
+        rule.setMaxBorrows(request.getMaxBorrows());
+        rule.setLoanDays(request.getLoanDays());
+        rule.setRenewals(request.getRenewals());
+        rule.setRenewalDays(request.getRenewalDays());
+        rule.setFinePerDay(request.getFinePerDay());
         ruleMapper.upsert(rule);
         return ResponseEntity.ok(rule);
     }

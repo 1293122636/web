@@ -32,4 +32,8 @@
     UPDATE fines SET paid=true, paid_at=#{paidAt} WHERE id=#{id}
   </update>
 
+  <select id="findByBorrowRecordId" resultType="java.lang.Integer">
+    SELECT id FROM fines WHERE borrowRecordId = #{borrowRecordId} LIMIT 1
+  </select>
+
 </mapper>

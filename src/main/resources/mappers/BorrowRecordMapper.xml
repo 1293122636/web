@@ -93,4 +93,14 @@
     SELECT COUNT(*) FROM borrow_records WHERE status = 'overdue'
   </select>
 
+  <select id="findActiveByBookItemId" resultMap="borrowWithBook">
+    SELECT * FROM borrow_records WHERE bookItemId = #{bookItemId} AND status = 'active' LIMIT 1
+  </select>
+
+  <select id="findOverdueBorrows" resultType="com.library.entity.BorrowRecord">
+    SELECT id, userId, bookId, bookItemId, borrow_date AS borrowDate, due_date AS dueDate,
+           return_date AS returnDate, status, renewed, created_at AS createdAt, updated_at AS updatedAt
+    FROM borrow_records WHERE status = 'active' AND due_date &lt; NOW()
+  </select>
+
 </mapper>

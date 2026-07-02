@@ -3,9 +3,15 @@ package com.library.service;
 import com.library.dto.response.BookDetailResponse;
 import com.library.dto.response.BookItemResponse;
 import com.library.dto.response.CategoryResponse;
-import com.library.entity.*;
+import com.library.entity.AuditLog;
+import com.library.entity.Book;
+import com.library.entity.BookItem;
+import com.library.entity.BorrowRecord;
 import com.library.exception.AppException;
 import com.library.mapper.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +21,13 @@ import java.util.stream.Collectors;
 @Service
 public class BookService {
 
+    private static final Logger log = LoggerFactory.getLogger(BookService.class);
+
     private final BookMapper bookMapper;
     private final BookItemMapper bookItemMapper;
+    private final CategoryMapper categoryMapper;
+    private final BorrowRecordMapper borrowRecordMapper;
+    private final AuditLogMapper auditLogMapper;
 
     // Status transition validation
     private static final Map<String, List<String>> STATUS_TRANSITIONS = new HashMap<>();
@@ -29,9 +40,12 @@ public class BookService {
         STATUS_TRANSITIONS.put("withdrawn", Collections.emptyList());
     }
 
-    public BookService(BookMapper bookMapper, BookItemMapper bookItemMapper) {
+    public BookService(BookMapper bookMapper, BookItemMapper bookItemMapper, CategoryMapper categoryMapper, BorrowRecordMapper borrowRecordMapper, AuditLogMapper auditLogMapper) {
         this.bookMapper = bookMapper;
         this.bookItemMapper = bookItemMapper;
+        this.categoryMapper = categoryMapper;
+        this.borrowRecordMapper = borrowRecordMapper;
+        this.auditLogMapper = auditLogMapper;
     }
 
     public Map<String, Object> list(Map<String, Object> params) {
@@ -78,8 +92,9 @@ public class BookService {
         resp.setUpdatedAt(book.getUpdatedAt());
 
         if (book.getCategory() != null) {
+            int bookCount = (int) categoryMapper.countBooksByCategory(book.getCategory().getId());
             resp.setCategory(new CategoryResponse(book.getCategory().getId(), book.getCategory().getName(),
-                    book.getCategory().getDesc(), 0));
+                    book.getCategory().getDesc(), bookCount));
         }
 
         List<BookItem> items = bookItemMapper.findByBookId(id);
@@ -107,6 +122,32 @@ public class BookService {
         return resp;
     }
 
+    public List<BookItemResponse> getItemsByBookId(Integer id) {
+        // Verify book exists
+        Book book = bookMapper.findById(id);
+        if (book == null) throw AppException.notFound("Book not found");
+
+        List<BookItem> items = bookItemMapper.findByBookId(id);
+        return items.stream().map(item -> {
+            BookItemResponse ir = new BookItemResponse();
+            ir.setId(item.getId());
+            ir.setBarcode(item.getBarcode());
+            ir.setCallNumber(item.getCallNumber());
+            ir.setLocation(item.getLocation());
+            ir.setCampus(item.getCampus());
+            ir.setCondition(item.getCondition());
+            ir.setStatus(item.getStatus());
+            ir.setPrice(item.getPrice() != null ? item.getPrice().doubleValue() : null);
+            ir.setAcquiredAt(item.getAcquiredAt());
+            ir.setRequests(item.getRequests());
+            ir.setBookId(item.getBookId());
+            ir.setItemTypeId(item.getItemTypeId());
+            ir.setCreatedAt(item.getCreatedAt());
+            ir.setUpdatedAt(item.getUpdatedAt());
+            return ir;
+        }).collect(Collectors.toList());
+    }
+
     @Transactional
     public Book create(com.library.dto.request.BookCreateRequest data) {
         Book book = new Book();
@@ -128,6 +169,7 @@ public class BookService {
         book.setCountry(data.getCountry());
         book.setCategoryId(data.getCategoryId());
         bookMapper.insert(book);
+        audit("create", "book:" + book.getId(), "Created book: " + book.getTitle());
         return book;
     }
 
@@ -166,7 +208,9 @@ public class BookService {
             bookMapper.update(updateBook);
         }
 
-        return bookMapper.findById(id);
+        Book updated = bookMapper.findById(id);
+        audit("update", "book:" + id, "Updated book: " + (updated != null ? updated.getTitle() : id));
+        return updated;
     }
 
     @Transactional
@@ -174,6 +218,7 @@ public class BookService {
         long count = bookItemMapper.countByBookId(id);
         if (count > 0) throw AppException.badRequest("Cannot delete book with " + count + " existing copies");
         bookMapper.deleteById(id);
+        audit("delete", "book:" + id, "Deleted book id: " + id);
     }
 
     public Map<String, Object> getFacets(Map<String, Object> params) {
@@ -207,9 +252,25 @@ public class BookService {
     public Map<String, Object> lookupByBarcode(String barcode) {
         BookItem item = bookItemMapper.findByBarcode(barcode);
         if (item == null) return null;
-        // Return simplified view
         Map<String, Object> result = new HashMap<>();
         result.put("item", item);
+        // Load active borrow for circulation display
+        BorrowRecord activeBorrow = borrowRecordMapper.findActiveByBookItemId(item.getId());
+        if (activeBorrow != null) {
+            result.put("currentBorrow", activeBorrow);
+        }
         return result;
+    }
+
+    private void audit(String action, String target, String detail) {
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAction(action);
+        auditLog.setTarget(target);
+        auditLog.setDetail(detail);
+        try {
+            auditLogMapper.insert(auditLog);
+        } catch (Exception e) {
+            log.error("审计日志写入失败: action={}, target={}", action, target, e);
+        }
     }
 }

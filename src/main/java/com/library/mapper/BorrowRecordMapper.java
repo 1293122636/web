@@ -27,4 +27,10 @@ public interface BorrowRecordMapper {
     long countOverdue();
     List<Map<String, Object>> monthlyStats(LocalDateTime since);
     List<Map<String, Object>> popularBooks();
+
+    // For overdue fine scheduler
+    List<BorrowRecord> findOverdueBorrows();
+
+    // For circulation barcode scan
+    BorrowRecord findActiveByBookItemId(@Param("bookItemId") Integer bookItemId);
 }

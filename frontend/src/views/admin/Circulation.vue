@@ -12,7 +12,7 @@
             <n-descriptions-item label="状态">
               <StatusBadge :status="currentItem.status" />
             </n-descriptions-item>
-            <n-descriptions-item label="当前位置">{{ currentBorrow ? '借出 (' + currentBorrow.userId + ')' : '在架' }}</n-descriptions-item>
+            <n-descriptions-item label="当前位置">{{ currentBorrow ? '借出 (' + (currentBorrow.user?.name || '读者#' + currentBorrow.userId) + ')' : '在架' }}</n-descriptions-item>
           </n-descriptions>
           <n-space v-if="currentItem" style="margin-top:12px">
             <n-button v-if="!currentBorrow" type="success" @click="addToQueue('borrow')">借书</n-button>
@@ -57,8 +57,8 @@ const queue = ref<any[]>([])
 async function onScan(barcode: string) {
   try {
     const { data } = await api.get(`/book-items/${encodeURIComponent(barcode)}`)
-    currentItem.value = data
-    currentBorrow.value = data.currentBorrow
+    currentItem.value = data.item
+    currentBorrow.value = data.currentBorrow ?? null
     playBeep(data.currentBorrow ? 'return' : 'borrow')
   } catch { message.error('条码未找到') }
 }

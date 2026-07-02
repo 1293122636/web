@@ -3,7 +3,7 @@
     <div class="cover-wrap">
       <img v-if="book.cover" :src="book.cover" class="cover-img" loading="lazy" />
       <div v-else class="cover-placeholder">
-        <span class="cover-letter">{{ book.title[0] }}</span>
+        <span class="cover-letter">{{ book.title?.[0] || '?' }}</span>
       </div>
     </div>
     <div class="info">

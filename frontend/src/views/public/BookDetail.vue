@@ -16,7 +16,7 @@
           <div class="cover-section">
             <img v-if="book.cover" :src="book.cover" class="cover-img" />
             <div v-else class="cover-placeholder">
-              <span class="cover-letter">{{ book.title[0] }}</span>
+              <span class="cover-letter">{{ book.title?.[0] || '?' }}</span>
             </div>
             <div class="cover-actions">
               <n-button type="primary" size="large" block @click="handleBorrow">
@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { NIcon } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { ArrowBackOutline, PersonOutline, BookOutline, TimeOutline } from '@vicons/ionicons5'
@@ -65,6 +65,7 @@ import api, { bookApi } from '../../api'
 import type { BookDetail } from '../../types/api'
 
 const route = useRoute()
+const router = useRouter()
 const message = useMessage()
 const book = ref<BookDetail | null>(null)
 const loading = ref(true)
@@ -74,6 +75,12 @@ function hasToken() { return !!localStorage.getItem('token') }
 
 onMounted(async () => {
   const id = Number(route.params.id)
+  if (isNaN(id) || id <= 0) {
+    message.error('无效的图书ID')
+    router.push('/books')
+    loading.value = false
+    return
+  }
   loading.value = true
   try {
     book.value = (await bookApi.getById(id)).data

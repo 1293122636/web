@@ -24,9 +24,9 @@ class BorrowServiceTest extends AbstractServiceTest {
     @BeforeEach
     void setUp() {
         ruleService = new RuleService(circulationRuleMapper);
-        fineService = new FineService(fineMapper, userMapper);
-        bookService = new BookService(bookMapper, bookItemMapper);
-        holdService = new HoldService(holdMapper, bookMapper, bookItemMapper, bookService);
+        fineService = new FineService(fineMapper, userMapper, auditLogMapper);
+        bookService = new BookService(bookMapper, bookItemMapper, categoryMapper, borrowRecordMapper, auditLogMapper);
+        holdService = new HoldService(holdMapper, bookMapper, bookItemMapper, bookService, auditLogMapper);
         borrowService = new BorrowService(
                 borrowRecordMapper, bookMapper, bookItemMapper, userMapper,
                 auditLogMapper, ruleService, fineService,
@@ -120,6 +120,14 @@ class BorrowServiceTest extends AbstractServiceTest {
         when(userMapper.findById(1)).thenReturn(user);
         when(borrowRecordMapper.findActiveByUserAndBook(1, 1)).thenReturn(new BorrowRecord());
 
+        CirculationRule rule = new CirculationRule();
+        rule.setMaxBorrows(5);
+        rule.setLoanDays(30);
+        rule.setRenewals(1);
+        rule.setRenewalDays(15);
+        rule.setFinePerDay(BigDecimal.valueOf(0.10));
+        when(circulationRuleMapper.findDefault()).thenReturn(rule);
+
         assertThrows(AppException.class, () -> borrowService.borrow(1, req));
     }
 
@@ -189,7 +197,7 @@ class BorrowServiceTest extends AbstractServiceTest {
         record.setBookItemId(10);
         record.setStatus("active");
         record.setDueDate(LocalDateTime.now().plusDays(5));
-        record.setBorrowDate(LocalDateTime.now().minusDays(10));
+        record.setBorrowDate(LocalDateTime.now());
 
         User user = new User();
         user.setId(1);
@@ -217,6 +225,51 @@ class BorrowServiceTest extends AbstractServiceTest {
         assertNotNull(result);
         assertEquals("returned", result.getStatus());
         verify(borrowRecordMapper).returnBook(eq(50), any(), eq("returned"));
+        verify(bookMapper).incrementAvailable(1);
+        // Non-overdue return should not create any fine
+        // Verify via fineMapper since fineService is a real instance
+        verify(fineMapper, never()).insert(any(Fine.class));
+    }
+
+    @Test
+    void returnBook_shouldCreateFineWhenOverdue() {
+        BorrowRecord record = new BorrowRecord();
+        record.setId(60);
+        record.setUserId(1);
+        record.setBookId(1);
+        record.setBookItemId(10);
+        record.setStatus("active");
+        record.setDueDate(LocalDateTime.now().minusDays(5));
+        record.setBorrowDate(LocalDateTime.now().minusDays(35));
+
+        User user = new User();
+        user.setId(1);
+        record.setUser(user);
+
+        BookItem bookItem = new BookItem();
+        bookItem.setId(10);
+        bookItem.setItemTypeId(1);
+        record.setBookItem(bookItem);
+
+        BorrowRecord returned = new BorrowRecord();
+        returned.setId(60);
+        returned.setStatus("returned");
+
+        when(borrowRecordMapper.findById(60)).thenReturn(record, returned);
+
+        CirculationRule rule = new CirculationRule();
+        rule.setLoanDays(30);
+        rule.setFinePerDay(BigDecimal.valueOf(0.10));
+        when(circulationRuleMapper.findDefault()).thenReturn(rule);
+
+        when(holdMapper.findNextPendingByBookId(1)).thenReturn(null);
+        when(bookMapper.incrementAvailable(1)).thenReturn(1);
+
+        borrowService.returnBook(60, 1, false);
+
+        // Verify fine was created and overdue status set
+        verify(fineMapper).insert(any(Fine.class));
+        verify(borrowRecordMapper).returnBook(eq(60), any(), eq("overdue"));
         verify(bookMapper).incrementAvailable(1);
     }
 

@@ -16,8 +16,8 @@ class HoldServiceTest extends AbstractServiceTest {
 
     @BeforeEach
     void setUp() {
-        bookService = new BookService(bookMapper, bookItemMapper);
-        holdService = new HoldService(holdMapper, bookMapper, bookItemMapper, bookService);
+        bookService = new BookService(bookMapper, bookItemMapper, categoryMapper, borrowRecordMapper, auditLogMapper);
+        holdService = new HoldService(holdMapper, bookMapper, bookItemMapper, bookService, auditLogMapper);
     }
 
     @Test

@@ -28,6 +28,7 @@ export interface BookItemSummary {
   id: number; barcode: string; callNumber?: string | null
   location?: string | null; campus?: string | null; status: string
   requests: number; price?: number | null
+  condition?: string | null
 }
 export interface BookItemsResponse { book: { id: number; title: string; isbn: string }; items: BookItemSummary[] }
 

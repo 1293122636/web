@@ -79,7 +79,7 @@ async function fetchFines() {
     if (filterType.value) params.type = filterType.value
     if (filterPaid.value) params.paid = filterPaid.value
     const { data } = await api.get('/fines', { params })
-    fines.value = data || []
+    fines.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch { /* ignore */ }
   loading.value = false
 }
