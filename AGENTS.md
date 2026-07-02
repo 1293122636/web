@@ -71,6 +71,10 @@ frontend/                        # Vue 3 + Vite + Naive UI
     views/       17 files
     App.vue
 ```
+*Static resources:*
+`src/main/resources/static/covers/` — 20 book cover images (local, no external CDN).
+Seed data stores `cover` as `/covers/{id}-{title}.{ext}` (e.g. `/covers/1-算法导论.jpg`).
+Spring Boot auto-serves via `:8080/covers/...`. Frontend renders via `<img :src="book.cover">` — no extra config needed.
 
 ### 3.1 认证流程
 

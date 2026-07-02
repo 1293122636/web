@@ -54,6 +54,8 @@ DB_PASSWORD=*** ./start.sh
 
 > 不要用 `mvn spring-boot:run`，反复调用有 OOM 问题。用 `./start.sh` 或直接 `java -jar`。
 
+> 首次启动前确保已执行 `npm install`。封面图片已在 `src/main/resources/static/covers/` 目录下，由后端自动托管，前端直接从数据库返回的 `/covers/*` 路径加载。
+
 ### 3. 启动前端（:5175）
 
 ```bash
@@ -130,6 +132,7 @@ library-full-stack/
 │
 ├── src/main/resources/
 │   ├── mappers/                # 9 个 MyBatis XML 映射文件
+│   ├── static/covers/          # 20 张图书封面本地图片
 │   ├── application.yml         # 通用配置
 │   ├── application-dev.yml     # 开发环境（Druid + MySQL）
 │   └── application-prod.yml    # 生产环境
@@ -200,7 +203,7 @@ library-full-stack/
 | 资料类型 | 3 | 普通图书/教材/期刊，不同借阅天数 |
 | 流通规则 | 9 | 3×3 矩阵：每种读者×每种资料 的借阅限制 |
 | 用户 | 9 | 管理员 1 人 + 读者 8 人（含逾期/罚款示例） |
-| 图书 | 20 | 计算机/文学/经济/科学 4 类 |
+|| 图书 | 20 | 计算机/文学/经济/科学 4 类，每本含本地封面图 |
 | 复本 | 63 | 部分图书有多个副本 |
 | 借阅记录 | 23 | 含已逾期、已归还、正常借出 |
 | 罚款 | 2 | 逾期罚款示例 |
