@@ -223,7 +223,7 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-./mvnw test    # 55 tests, 0 failures required
+./mvnw test    # 96 tests, 0 failures required
 ```
 
 ### 常用命令速查
@@ -342,7 +342,7 @@ git push origin <分支名>
 
 ## 项目状态
 
-45 API · 71 Java 文件 · 31 Vue 文件 · 9 XML Mapper · 55 测试 ✅
+45 API · 71 Java 文件 · 31 Vue 文件 · 9 XML Mapper · **96 测试** ✅
 
 ---
 

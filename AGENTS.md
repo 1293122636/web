@@ -9,7 +9,7 @@
 图书馆全栈管理系统（Spring Boot 3 版）。四层架构：Vue3+NaiveUI（`frontend/`）→ Controller → Service → Mapper(MyBatis+XML) → MySQL。
 
 Origin: https://github.com/Mrappleking/library-full-stack
-Status: 45 API endpoints | 71 Java files | 31 Vue files | 9 XML mappers | 55 tests
+Status: 45 API endpoints | 71 Java files | 31 Vue files | 9 XML mappers | 96 tests
 
 ## 2. Commands
 
@@ -19,7 +19,7 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 
 # Backend
 ./mvnw compile                                          # compile
-./mvnw test                                             # 55 tests, 0 failures required
+./mvnw test                                             # 96 tests, 0 failures required
 ./mvnw clean package -DskipTests                        # build JAR (skip tests)
 ./start.sh                                              # build + run -> :8080 (dev)
 ./start.sh prod                                         # build + run -> :8080 (prod)
