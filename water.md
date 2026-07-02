@@ -30,7 +30,7 @@ GitHub权限调用
 
 场景二：你通过OAuth应用获得了授权
 如果你不是在本地操作Git，而是指某个第三方应用（或你的脚本）通过OAuth授权流程获得了主人仓库的访问令牌（Token），那么“调用”通常指通过REST API或GraphQL API进行操作：
-
+asd
 API直接调用：持有用户授权生成的Token后，可以直接向GitHub API端点发起请求。例如，GET /repos/{owner}/{repo}/contents 可以直接读取仓库文件，POST /repos/{owner}/{repo}/issues 可以直接创建Issue。
 
 权限范围限定：你能调用的接口完全取决于授权时申请的scope（如repo全权控制或public_repo仅限公共仓库）。即使有了Token，如果没有对应的权限点（如删除仓库或修改Actions），API也会返回403错误。
