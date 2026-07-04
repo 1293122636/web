@@ -50,7 +50,7 @@ public class UploadController {
             file.transferTo(targetPath.toFile());
             log.info("Cover upload:{}",filename);
         } catch(IOException e){
-            log.info("Cover upload failed",e);
+            log.error("Cover upload failed",e);
             throw AppException.serverError("文件保存失败");
         }
         return ResponseEntity.ok(Map.of("path","/covers/"+filename));
