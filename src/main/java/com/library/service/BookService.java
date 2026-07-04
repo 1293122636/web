@@ -9,7 +9,10 @@ import com.library.entity.BookItem;
 import com.library.entity.BorrowRecord;
 import com.library.exception.AppException;
 import com.library.mapper.*;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,7 @@ public class BookService {
     private final CategoryMapper categoryMapper;
     private final BorrowRecordMapper borrowRecordMapper;
     private final AuditLogMapper auditLogMapper;
-
+    
     // Status transition validation
     private static final Map<String, List<String>> STATUS_TRANSITIONS = new HashMap<>();
     static {
@@ -47,7 +50,7 @@ public class BookService {
         this.borrowRecordMapper = borrowRecordMapper;
         this.auditLogMapper = auditLogMapper;
     }
-
+    
     public Map<String, Object> list(Map<String, Object> params) {
         int page = Math.max(1, params.get("page") != null ? (Integer) params.get("page") : 1);
         int limit = Math.min(50, Math.max(1, params.get("limit") != null ? (Integer) params.get("limit") : 20));
@@ -190,6 +193,7 @@ public class BookService {
             data.remove("total");
         }
 
+
         if (!data.isEmpty()) {
             Book updateBook = new Book();
             updateBook.setId(id);
@@ -198,13 +202,18 @@ public class BookService {
             if (data.containsKey("isbn")) updateBook.setIsbn((String) data.get("isbn"));
             if (data.containsKey("publisher")) updateBook.setPublisher((String) data.get("publisher"));
             if (data.containsKey("location")) updateBook.setLocation((String) data.get("location"));
-            if (data.containsKey("cover")) updateBook.setCover((String) data.get("cover"));
+            if (data.containsKey("cover")) {
+                String newCover = (String) data.get("cover");
+                updateBook.setCover(newCover);
+                removeOldCoverIfChanged(current.getCover(), newCover);
+            }
             if (data.containsKey("desc")) updateBook.setDesc((String) data.get("desc"));
             if (data.containsKey("clcNumber")) updateBook.setClcNumber((String) data.get("clcNumber"));
             if (data.containsKey("physicalDesc")) updateBook.setPhysicalDesc((String) data.get("physicalDesc"));
             if (data.containsKey("language")) updateBook.setLanguage((String) data.get("language"));
             if (data.containsKey("country")) updateBook.setCountry((String) data.get("country"));
             if (data.containsKey("categoryId")) updateBook.setCategoryId((Integer) data.get("categoryId"));
+            
             bookMapper.update(updateBook);
         }
 
@@ -260,6 +269,19 @@ public class BookService {
             result.put("currentBorrow", activeBorrow);
         }
         return result;
+    }
+
+     private void removeOldCoverIfChanged(String oldCover,String newCover){
+        if(oldCover!=null&&oldCover.startsWith("/covers/")&&!oldCover.equals(newCover)){
+            try{
+                Path oldFile =Paths.get("src/main/resources/static"+oldCover);
+                Files.deleteIfExists(oldFile);
+                log.info("Deleted old cover:{}",oldCover);
+            }catch(IOException e){
+                log.warn("Failed to delete old cover:{}",oldCover,e);
+            }
+        }
+            
     }
 
     private void audit(String action, String target, String detail) {

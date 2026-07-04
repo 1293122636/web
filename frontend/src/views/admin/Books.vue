@@ -36,6 +36,25 @@
           <n-grid-item><n-form-item label="数量" path="total"><n-input-number v-model:value="form.total" :min="1" style="width:100%" /></n-form-item></n-grid-item>
           <n-grid-item><n-form-item label="位置"><n-input v-model:value="form.location" placeholder="书架位置" /></n-form-item></n-grid-item>
         </n-grid>
+         <n-form-item label="封面">
+      <div style="display:flex;gap:12px;align-items:flex-start;width:100%;">
+        <n-upload
+          :action="'/api/upload/cover'"
+          :headers="{ 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }"
+          accept=".jpg,.jpeg,.png,.webp"
+          :max="1"
+          :show-file-list="false"
+          @finish="handleUploadFinish"
+          @error="handleUploadError"
+          @before-upload="beforeUpload"
+        >
+          <n-button :disabled="!editingId">选择封面</n-button>
+        </n-upload>
+        <n-spin v-if="uploading" size="small" />
+        <img v-else-if="form.cover" :src="form.cover" style="max-width:100px;max-height:140px;border-radius:4px;object-fit:cover;" />
+        <span v-else style="color:#8a8f98;font-size:13px;align-self:center;">未设置封面</span>
+      </div>
+    </n-form-item>
         <n-form-item label="描述"><n-input v-model:value="form.desc" type="textarea" placeholder="图书简介" /></n-form-item>
       </n-form>
       <template #footer>
@@ -66,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue'
-import { useMessage, NTag, NButton, NPopconfirm } from 'naive-ui'
+import { useMessage, NTag, NButton, NPopconfirm, NUpload, NSpin } from 'naive-ui'
 import api from '@/api'
 import type { BookSummary, BookItemSummary } from '@/types/api'
 import type { DataTableColumn } from 'naive-ui'
@@ -186,7 +205,36 @@ function onExpand(keys: number[]) { expandedKeys.value = keys }
 const showModal = ref(false)
 const editingId = ref<number | null>(null)
 const saving = ref(false)
-const form = reactive({ isbn: '', title: '', author: '', publisher: '', year: undefined as number | undefined, categoryId: null as number | null, total: 1, location: '', desc: '' })
+const form = reactive({ isbn: '', title: '', author: '', publisher: '', year: undefined as number | undefined, categoryId: null as number | null, total: 1, location: '', desc: '', cover: '' })
+const uploading = ref(false)
+function beforeUpload({ file }: { file: File }) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp']
+  if (!allowed.includes(file.type)) {
+    message.error('只接受 jpg/png/webp 格式')
+    return false
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    message.error('文件大小不能超过 5MB')
+    return false
+  }
+  uploading.value = true
+  return true
+}
+
+function handleUploadFinish({ event }: { event: ProgressEvent }) {
+  uploading.value = false
+  const resp = JSON.parse((event.target as XMLHttpRequest).response)
+  if (resp.path) {
+    form.cover = resp.path
+    message.success('封面上传成功')
+  }
+}
+
+function handleUploadError() {
+  uploading.value = false
+  message.error('上传失败')
+}
+
 const rulesData = {
   isbn: [{ required: true, message: '必填' }],
   title: [{ required: true, message: '必填' }],
@@ -194,8 +242,8 @@ const rulesData = {
   categoryId: [{ required: true, type: 'number' as const, message: '必选' }]
 }
 
-function openCreate() { editingId.value = null; Object.assign(form, { isbn: '', title: '', author: '', publisher: '', year: undefined, categoryId: null, total: 1, location: '', desc: '' }); showModal.value = true }
-function openEdit(row: any) { editingId.value = row.id; Object.assign(form, { isbn: row.isbn, title: row.title, author: row.author, publisher: row.publisher, year: row.year, categoryId: row.category?.id ?? null, total: row.total, location: row.location, desc: row.desc }); showModal.value = true }
+function openCreate() { editingId.value = null; Object.assign(form, { isbn: '', title: '', author: '', publisher: '', year: undefined, categoryId: null, total: 1, location: '', desc: '',cover: '' }); showModal.value = true }
+function openEdit(row: any) { editingId.value = row.id; Object.assign(form, { isbn: row.isbn, title: row.title, author: row.author, publisher: row.publisher, year: row.year, categoryId: row.category?.id ?? null, total: row.total, location: row.location, desc: row.desc,cover:row.cover ||'' }); showModal.value = true }
 
 async function handleSave() {
   saving.value = true
