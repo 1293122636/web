@@ -31,4 +31,7 @@ public class AppException extends RuntimeException {
     public static AppException conflict(String message) {
         return new AppException(409, message);
     }
+    public static AppException serverError(String message){
+        return new AppException(500, message);
+    }
 }
